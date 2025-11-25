@@ -1,0 +1,148 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: Server Config
+
+		DealDamage: {
+			Label: Deal Damage
+			Tooltip: Modifies damage dealt to enemies. Uses multiplier 1.2^x where x is the value (0 = no change).
+		}
+
+		TakeDamage: {
+			Label: Take Damage
+			Tooltip: Modifies damage taken from enemies. Uses multiplier 1.2^x where x is the value (0 = no change).
+		}
+
+		EqualizeDeathsMode: {
+			Label: Equalize Deaths Mode
+			Tooltip: Increases damage taken for players below the average death count during boss fights. Damage increases exponentially by time if everyone is dead.
+		}
+
+		ExpectedTotalMinutes: {
+			Label: Expected Total Minutes
+			Tooltip: Expected time in minutes for a boss fight. The boss will dynamically adjust defense to attempt matching this duration. Set to 0 to disable scaling.
+		}
+
+		MaxDefenseModifier: {
+			Label: Max Defense Modifier
+			Tooltip: Maximum amount the boss can increase its defense to reduce damage and extend the fight time.
+		}
+
+		ScalingConstant: {
+			Label: Scaling Constant
+			Tooltip: Controls how quickly the boss defense increases based on pacing difference. Higher values make scaling more aggressive.
+		}
+
+		BossProgressionThreshold: {
+			Label: Boss Progression Threshold
+			Tooltip: Time-scaling won't apply to bosses with a BossChecklist progression value below this threshold. 0 to disable. Use /dumpprogression to view progression values from BossChecklist.
+		}
+
+		TargetHighestHealth: {
+			Label: Target Highest Health
+			Tooltip: Forces bosses to prioritize targeting the player with the highest health.
+		}
+
+		DebugMode: {
+			Label: Debug Mode
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: Stop Targeting If Lowest
+			Tooltip: Prevents bosses from targeting players who are within 20 HP of the lowest health player in range.
+		}
+
+		ExpectedPlayers: {
+			Label: Expected Players
+			Tooltip: Expected number of players for boss fights. If fewer players are present, the boss's damage and defense increase.
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: Expected Players Boss Progression Threshold
+			Tooltip: If set to a value greater than 0, expected players scaling won't apply to bosses\nwith a BossChecklist progression value below this threshold.\nSet to 0 to disable this feature.\nRequires BossChecklist mod to be installed.\nUse /dumpprogression to view progression values.
+		}
+
+		ScalingMultiplier: {
+			Label: Scaling Multiplier
+			Tooltip: Multiplier for how much extra damage and defense the boss gains when fewer than expected players are fighting.
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: Weapon Adaptation Enabled
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: Weapon Adaptation Start Multiplier
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: Weapon Adaptation Complete Multiplier
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: Weapon Adaptation Min Damage
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: Weapon Adaptation Max Reduction
+			Tooltip: Controls how aggressively weapons are nerfed toward the average. 0 = no change, 1 = weapon is nerfed to the average damage level.
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: Adapt To Solo Players
+			Tooltip: This will allow bosses to adapt to their weapon combo.
+		}
+
+		PlayerOverrides: {
+			Label: Player Overrides
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: Damage Editor
+			BossTimeScaling: Boss Time Scaling
+			BossTargetingSettings: Boss Targeting Settings
+			BossGroupSettings: Boss Group Settings
+			WeaponAdaptation: Weapon Adaptation
+			BossDynamicDamageScaling: Boss Dynamic Damage Scaling
+		}
+
+		HighHealthThreshold: {
+			Label: High Health Threshold
+			Tooltip: Players above this percentage are considered high health. When close to a boss, time above this threshold is tracked.
+		}
+
+		HighHealthDelaySeconds: {
+			Label: High Health Delay Seconds
+			Tooltip: The delay in seconds before the boss starts increasing damage on players remaining above the high health threshold.
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: High Health Damage Increase Per Second
+			Tooltip: The amount of additional damage per second the boss applies once the high health delay has passed.
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: Deal Damage Modifier Difference
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: Take Damage Modifier Difference
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: Equalize Deaths Mode
+			Tooltip: ""
+		}
+	}
+}
