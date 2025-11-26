@@ -155,6 +155,13 @@ namespace DynamicScaling
                 return -1;
             }
 
+            // Avoid registering for single-part boss bars that use CommonBossBigProgressBar.
+            // We only want group tracking for special/modded multi-part bars.
+            if (bossBar is CommonBossBigProgressBar)
+            {
+                return -1;
+            }
+
             // Check if any existing group uses this same boss bar
             int? existingGroupId = FindGroupWithSameBossBar(bossBar, npc);
             if (existingGroupId.HasValue)

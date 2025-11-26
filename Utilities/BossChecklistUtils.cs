@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terraria.ModLoader;
 
 namespace DynamicScaling
 {
@@ -104,6 +105,77 @@ namespace DynamicScaling
                 }
                 return normalized;
             }
+
+            return null;
+        }
+
+        // Convenience helper to query BossChecklist progression for a given NPC type.
+        // Returns null if bossChecklist isn't available or the entry doesn't exist.
+        public static double? GetBossChecklistProgressionForNPC(int npcType)
+        {
+            try
+            {
+                var bossChecklistMod = ModLoader.GetMod("BossChecklist");
+                if (bossChecklistMod == null)
+                    return null;
+
+                object result = bossChecklistMod.Call("GetBossInfoDictionary", ModLoader.GetMod("DynamicScaling"), "2.0");
+                if (result is string || result == null)
+                {
+                    // Fallback to older API version for compatibility
+                    result = bossChecklistMod.Call("GetBossInfoDictionary", ModLoader.GetMod("DynamicScaling"), "1.6");
+                }
+                if (result == null)
+                    return null;
+                var normalized = NormalizeBossChecklistReturn(result);
+                if (normalized != null)
+                {
+                    foreach (var kv in normalized)
+                    {
+                        if (kv.Value is IDictionary<string, object> info)
+                        {
+                            // Extract npcIDs
+                            if (info.TryGetValue("npcIDs", out var idsObj))
+                            {
+                                List<int> ids = new List<int>();
+                                if (idsObj is System.Collections.IEnumerable ie && !(idsObj is string))
+                                {
+                                    foreach (var o in ie)
+                                    {
+                                        if (o == null) continue;
+                                        if (o is int i)
+                                            ids.Add(i);
+                                        else
+                                        {
+                                            if (int.TryParse(o.ToString(), out int parsed))
+                                                ids.Add(parsed);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (int.TryParse(idsObj.ToString(), out int single))
+                                        ids.Add(single);
+                                }
+
+                                if (ids.Contains(npcType))
+                                {
+                                    if (info.TryGetValue("progression", out var pVal))
+                                    {
+                                        try
+                                        {
+                                            double p = Convert.ToDouble(pVal);
+                                            return p;
+                                        }
+                                        catch { }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
 
             return null;
         }

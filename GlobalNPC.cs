@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Localization;
@@ -85,7 +86,7 @@ namespace DynamicScaling
                 {
                     if (!isScalingDisabled && config?.BossProgressionThreshold > 0)
                     {
-                        double? prog = BossGroupTracker.GetBossChecklistProgressionForNPC(npc.type);
+                        double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
                         if (prog.HasValue && prog.Value < config.BossProgressionThreshold)
                         {
                             isScalingDisabled = true;
@@ -96,8 +97,65 @@ namespace DynamicScaling
                 }
                 catch { }
 
+                // Register for group-based tracking only if this boss has a special boss bar
+                try { BossGroupTracker.RegisterBoss(npc); } catch { }
                 ScalingBossBar.ClearCache();
             }
+        }
+
+        // Client-side cache for network-synced modifiers and adaptation factors.
+        private static Dictionary<int, (float defenseModifier, float offenseModifier)> clientModifiers = new Dictionary<int, (float, float)>();
+        private static Dictionary<int, Dictionary<(int playerId, int weaponKey), float>> clientAdaptationFactors = new Dictionary<int, Dictionary<(int, int), float>>();
+
+        public static bool TryGetClientModifiers(int npcWhoAmI, out float defense, out float offense)
+        {
+            defense = 1f; offense = 1f;
+            if (clientModifiers.TryGetValue(npcWhoAmI, out var tup))
+            {
+                defense = tup.defenseModifier;
+                offense = tup.offenseModifier;
+                return true;
+            }
+            return false;
+        }
+
+        public static void SetClientModifiers(int npcWhoAmI, float defense, float offense)
+        {
+            clientModifiers[npcWhoAmI] = (defense, offense);
+        }
+
+        public static void SetClientAdaptationFactor(int npcWhoAmI, (int playerId, int weaponKey) key, float factor)
+        {
+            if (!clientAdaptationFactors.TryGetValue(npcWhoAmI, out var dict))
+            {
+                dict = new Dictionary<(int, int), float>();
+                clientAdaptationFactors[npcWhoAmI] = dict;
+            }
+            dict[key] = factor;
+        }
+
+        public static bool TryGetClientAdaptationFactor(int npcWhoAmI, (int playerId, int weaponKey) key, out float factor)
+        {
+            factor = 1f;
+            if (clientAdaptationFactors.TryGetValue(npcWhoAmI, out var dict) && dict.TryGetValue(key, out float val))
+            {
+                factor = val;
+                return true;
+            }
+            return false;
+        }
+
+        // Server-side helper called by the BossSyncPacket when clients report damage.
+        // This finds the NPC and applies the recorded combo damage into that NPC's scaling instance.
+        public static void ReportComboDamage(int npcWhoAmI, int playerId, int weaponKey, int amount)
+        {
+            if (Main.netMode != NetmodeID.Server) return;
+            if (npcWhoAmI < 0 || npcWhoAmI >= Main.maxNPCs) return;
+            var npc = Main.npc[npcWhoAmI];
+            if (npc == null || !npc.active || !npc.boss) return;
+            var g = npc.GetGlobalNPC<ScalingGlobalNPC>();
+            if (g == null) return;
+            g.RecordComboDamage(npc, playerId, weaponKey, amount);
         }
 
         public static int TotalBossDeaths => totalBossDeaths;
@@ -141,6 +199,7 @@ namespace DynamicScaling
             if (npc.boss)
             {
                 ScalingBossBar.ClearCache();
+                try { BossGroupTracker.CleanupDeadNPC(npc.whoAmI); } catch { }
             }
         }
 
