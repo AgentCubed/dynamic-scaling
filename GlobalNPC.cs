@@ -277,7 +277,7 @@ namespace DynamicScaling
 
             if (currentHpInterval < lastHpInterval)
             {
-                UpdatePaceModifiers(npc, timeAlive, currentHpInterval);
+                UpdatePaceModifiers(npc, timeAlive, currentHpInterval, hpPercent);
                 EvaluateWeaponAdaptationOnInterval(npc);
             }
 
@@ -367,7 +367,7 @@ namespace DynamicScaling
             }
         }
 
-        private void UpdatePaceModifiers(NPC npc, double timeAlive, int currentHpInterval)
+        private void UpdatePaceModifiers(NPC npc, double timeAlive, int currentHpInterval, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
 
@@ -402,6 +402,12 @@ namespace DynamicScaling
                     currentDefenseModifier = modifier;
                     currentOffenseModifier = 1.0;
                 }
+            }
+
+            // Emit per-NPC debug at the 10% interval boundary
+            if (config?.DebugMode == true)
+            {
+                EmitDebugText(hpPercent);
             }
 
             lastHpInterval = currentHpInterval;
