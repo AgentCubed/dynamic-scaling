@@ -229,3 +229,4 @@ C:\Users\boden\Documents\My Games\Terraria\tModLoader\ModSources\DynamicScaling\
 C:\Users\boden\Documents\My Games\Terraria\tModLoader\ModSources\DynamicScaling\obj\Debug\net8.0\refint\DynamicScaling.dll
 C:\Users\boden\Documents\My Games\Terraria\tModLoader\ModSources\DynamicScaling\obj\Debug\net8.0\DynamicScaling.pdb
 C:\Users\boden\Documents\My Games\Terraria\tModLoader\ModSources\DynamicScaling\obj\Debug\net8.0\ref\DynamicScaling.dll
+C:\Users\boden\Documents\My Games\Terraria\tModLoader\ModSources\DynamicScaling\obj\Debug\net8.0\DynamicScaling.sourcelink.json

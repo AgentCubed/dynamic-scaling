@@ -177,7 +177,7 @@ namespace DynamicScaling
                     NPC npc = Main.npc[i];
                     if (npc.active && npc.boss)
                     {
-                        double? prog = BossGroupTracker.GetBossChecklistProgressionForNPC(npc.type);
+                        double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
                         if (prog.HasValue && prog.Value < config.ExpectedPlayersBossProgressionThreshold)
                         {
                             hasLowProgressionBoss = true;

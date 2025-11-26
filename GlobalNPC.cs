@@ -407,7 +407,7 @@ namespace DynamicScaling
             // Emit per-NPC debug at the 10% interval boundary
             if (config?.DebugMode == true)
             {
-                EmitDebugText(hpPercent);
+                EmitDebugText(npc, hpPercent);
             }
 
             lastHpInterval = currentHpInterval;
@@ -653,11 +653,30 @@ namespace DynamicScaling
             return "Unknown";
         }
 
-        private void EmitDebugText(double hpPercent)
+        private void EmitDebugText(NPC npc, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
             string paceMessage = "On Pace";
-                double displayDefMod = 1.0; // What we show as the boss defense multiplier
+            double displayDefMod = 1.0; // What we show as the boss defense multiplier
+
+            // If we are a multiplayer client, prefer the server-synced modifiers from the cache
+            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
+            {
+                // Use the client-cached defense modifier from the server for display
+                if (coff > 1.0f)
+                {
+                    paceMessage = $"Pace: +{lastTimeDifference:F1} min";
+                    displayDefMod = 1.0 / coff;
+                }
+                else if (cdef > 1.0f)
+                {
+                    paceMessage = $"Pace: {lastTimeDifference:F1} min";
+                    displayDefMod = cdef;
+                }
+                if (config?.DebugMode == true)
+                    Main.NewText($"(SYNC) {(int)(hpPercent * FullHealthPercent)}% HP | {paceMessage} | {displayDefMod:F2}x Def", Color.Gray);
+                return;
+            }
 
                 if (currentOffenseModifier > 1.0)
                 {
@@ -737,9 +756,30 @@ namespace DynamicScaling
 
         public override bool PreAI(NPC npc)
         {
-            // Only modify server-side state to avoid client desync.
+            // Ensure client-side initialization for npcs that are synced from the server.
+            // The server will run OnSpawn for real initialization; clients receive NPCs via network
+            // and do not invoke OnSpawn, leaving spawnTime uninitialized. Initialize minimal state
+            // on the client so that client-side debug and read-only displays function.
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
+                if (npc.boss && spawnTime < 0)
+                {
+                    // Initialize client-only state to avoid skipping scaling-related UI on clients.
+                    spawnTime = Main.time;
+                    ApplyConfigOverrides();
+                    currentDefenseModifier = 1.0;
+                    currentOffenseModifier = 1.0;
+                    lastHpInterval = FullHealthPercent;
+                    lastTimeDifference = 0.0;
+                    // Clear client-only caches to avoid displaying stale values
+                    comboDamagePhase.Clear();
+                    comboDamageRunning.Clear();
+                    comboAdaptationFactor.Clear();
+                    comboAdaptationWarned.Clear();
+                    lastPhaseTime = spawnTime;
+                }
+
+                // Clients should not run the following server-only logic.
                 return base.PreAI(npc);
             }
 

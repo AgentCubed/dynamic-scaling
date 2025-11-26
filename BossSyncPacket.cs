@@ -107,7 +107,7 @@ namespace DynamicScaling
             // Apply to client-side cache
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                BossGroupTracker.SetClientModifiers(npcIndex, def, off);
+                ScalingGlobalNPC.SetClientModifiers(npcIndex, def, off);
                 if (config?.DebugMode == true)
                 {
                     DebugUtil.EmitDebug($"[BossSyncPacket] Cache updated: npcIdx={npcIndex}, def={def:F2}x, off={off:F2}x", Microsoft.Xna.Framework.Color.Green);
@@ -126,7 +126,7 @@ namespace DynamicScaling
                 NPC npc = Main.npc[npcIndex];
                 if (npc == null || !npc.active || !npc.boss) return;
 
-                BossGroupTracker.ReportComboDamage(npcIndex, whoAmI, weaponKey, damage);
+                ScalingGlobalNPC.ReportComboDamage(npcIndex, whoAmI, weaponKey, damage);
             }
         }
 
@@ -145,7 +145,7 @@ namespace DynamicScaling
 
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                BossGroupTracker.SetClientAdaptationFactor(npcIndex, (playerId, weaponKey), factor);
+                ScalingGlobalNPC.SetClientAdaptationFactor(npcIndex, (playerId, weaponKey), factor);
                 if (config?.DebugMode == true)
                 {
                     DebugUtil.EmitDebug($"[BossSyncPacket] Client adaptation cache updated: npcIdx={npcIndex}, player={playerId}, weaponKey={weaponKey}, factor={factor:F2}", Microsoft.Xna.Framework.Color.Green);
