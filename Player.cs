@@ -168,7 +168,7 @@ namespace DynamicScaling
             }
 
             // Check Expected Players Progression Threshold
-            if (config.ExpectedPlayersBossProgressionThreshold > 0)
+            if (config.ExpectedPlayersBossProgressionThresholdValue > 0)
             {
                 // If any active boss has progression below threshold, disable scaling
                 bool hasLowProgressionBoss = false;
@@ -178,7 +178,7 @@ namespace DynamicScaling
                     if (npc.active && npc.boss)
                     {
                         double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
-                        if (prog.HasValue && prog.Value < config.ExpectedPlayersBossProgressionThreshold)
+                        if (prog.HasValue && prog.Value < config.ExpectedPlayersBossProgressionThresholdValue)
                         {
                             hasLowProgressionBoss = true;
                             break;

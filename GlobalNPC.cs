@@ -84,14 +84,14 @@ namespace DynamicScaling
                 // If configured, disable time scaling for bosses with progression less than threshold (from BossChecklist)
                 try
                 {
-                    if (!isScalingDisabled && config?.BossProgressionThreshold > 0)
+                    if (!isScalingDisabled && config?.BossProgressionThresholdValue > 0)
                     {
                         double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
-                        if (prog.HasValue && prog.Value < config.BossProgressionThreshold)
+                        if (prog.HasValue && prog.Value < config.BossProgressionThresholdValue)
                         {
                             isScalingDisabled = true;
                             if (config.DebugMode)
-                                DebugUtil.EmitDebug($"[ScalingGlobalNPC] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThreshold})", Color.Yellow);
+                                DebugUtil.EmitDebug($"[ScalingGlobalNPC] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
                         }
                     }
                 }

@@ -3,126 +3,126 @@ Configs: {
 		DisplayName: Server Config
 
 		DealDamage: {
-			Label: Deal Damage
+			Label: "[i:3507] Deal Damage"
 			Tooltip: Modifies damage dealt to enemies. Uses multiplier 1.2^x where x is the value (0 = no change).
 		}
 
 		TakeDamage: {
-			Label: Take Damage
+			Label: "[i:89] Take Damage"
 			Tooltip: Modifies damage taken from enemies. Uses multiplier 1.2^x where x is the value (0 = no change).
 		}
 
 		EqualizeDeathsMode: {
-			Label: Equalize Deaths Mode
+			Label: "[i:321] Equalize Deaths Mode"
 			Tooltip: Increases damage taken for players below the average death count during boss fights. Damage increases exponentially by time if everyone is dead.
 		}
 
 		ExpectedTotalMinutes: {
-			Label: Expected Total Minutes
+			Label: "[i:15] Expected Total Minutes"
 			Tooltip: Expected time in minutes for a boss fight. The boss will dynamically adjust defense to attempt matching this duration. Set to 0 to disable scaling.
 		}
 
 		MaxDefenseModifier: {
-			Label: Max Defense Modifier
+			Label: "[i:156] Max Defense Modifier"
 			Tooltip: Maximum amount the boss can increase its defense to reduce damage and extend the fight time.
 		}
 
 		ScalingConstant: {
-			Label: Scaling Constant
+			Label: "[i:149] Scaling Constant"
 			Tooltip: Controls how quickly the boss defense increases based on pacing difference. Higher values make scaling more aggressive.
 		}
 
 		BossProgressionThreshold: {
-			Label: Boss Progression Threshold
+			Label: "[i:43] Boss Progression Threshold"
 			Tooltip: Time-scaling won't apply to bosses with a BossChecklist progression value below this threshold. 0 to disable. Use /dumpprogression to view progression values from BossChecklist.
 		}
 
 		TargetHighestHealth: {
-			Label: Target Highest Health
+			Label: "[i:58] Target Highest Health"
 			Tooltip: Forces bosses to prioritize targeting the player with the highest health.
 		}
 
 		DebugMode: {
-			Label: Debug Mode
+			Label: "[i:1299] Debug Mode"
 			Tooltip: ""
 		}
 
 		StopTargetingIfLowest: {
-			Label: Stop Targeting If Lowest
+			Label: "[i:3202] Stop Targeting If Lowest"
 			Tooltip: Prevents bosses from targeting players who are within 20 HP of the lowest health player in range.
 		}
 
 		ExpectedPlayers: {
-			Label: Expected Players
+			Label: "[i:966] Expected Players"
 			Tooltip: Expected number of players for boss fights. If fewer players are present, the boss's damage and defense increase.
 		}
 
 		ExpectedPlayersBossProgressionThreshold: {
-			Label: Expected Players Boss Progression Threshold
-			Tooltip: If set to a value greater than 0, expected players scaling won't apply to bosses\nwith a BossChecklist progression value below this threshold.\nSet to 0 to disable this feature.\nRequires BossChecklist mod to be installed.\nUse /dumpprogression to view progression values.
+			Label: "[i:43] Expected Players Boss Progression Threshold"
+			Tooltip: Expected players scaling won't apply to bosses with a BossChecklist progression value below this threshold. 0 to disable. Use /dumpprogression to view progression values from BossChecklist.
 		}
 
 		ScalingMultiplier: {
-			Label: Scaling Multiplier
+			Label: "[i:184] Scaling Multiplier"
 			Tooltip: Multiplier for how much extra damage and defense the boss gains when fewer than expected players are fighting.
 		}
 
 		WeaponAdaptationEnabled: {
-			Label: Weapon Adaptation Enabled
+			Label: "[i:3507] Weapon Adaptation Enabled"
 			Tooltip: ""
 		}
 
 		WeaponAdaptationStartMultiplier: {
-			Label: Weapon Adaptation Start Multiplier
+			Label: "[i:3507] Weapon Adaptation Start Multiplier"
 			Tooltip: ""
 		}
 
 		WeaponAdaptationCompleteMultiplier: {
-			Label: Weapon Adaptation Complete Multiplier
+			Label: "[i:3507] Weapon Adaptation Complete Multiplier"
 			Tooltip: ""
 		}
 
 		WeaponAdaptationMinDamage: {
-			Label: Weapon Adaptation Min Damage
+			Label: "[i:3507] Weapon Adaptation Min Damage"
 			Tooltip: ""
 		}
 
 		WeaponAdaptationMaxReduction: {
-			Label: Weapon Adaptation Max Reduction
+			Label: "[i:3507] Weapon Adaptation Max Reduction"
 			Tooltip: Controls how aggressively weapons are nerfed toward the average. 0 = no change, 1 = weapon is nerfed to the average damage level.
 		}
 
 		WeaponAdaptationAdaptToSoloPlayers: {
-			Label: Adapt To Solo Players
+			Label: "[i:3507] Adapt To Solo Players"
 			Tooltip: This will allow bosses to adapt to their weapon combo.
 		}
 
 		PlayerOverrides: {
-			Label: Player Overrides
+			Label: "[i:58] Player Overrides"
 			Tooltip: ""
 		}
 
 		Headers: {
-			DamageEditor: Damage Editor
-			BossTimeScaling: Boss Time Scaling
-			BossTargetingSettings: Boss Targeting Settings
-			BossGroupSettings: Boss Group Settings
-			WeaponAdaptation: Weapon Adaptation
-			BossDynamicDamageScaling: Boss Dynamic Damage Scaling
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] Boss Time Scaling"
+			BossTargetingSettings: "[i:58] Boss Targeting Settings"
+			BossGroupSettings: "[i:966] Boss Group Settings"
+			WeaponAdaptation: "[i:3507] Weapon Adaptation"
+			BossDynamicDamageScaling: "[i:184] Boss Dynamic Damage Scaling"
 		}
 
 		HighHealthThreshold: {
-			Label: High Health Threshold
+			Label: "[i:58] High Health Threshold"
 			Tooltip: Players above this percentage are considered high health. When close to a boss, time above this threshold is tracked.
 		}
 
 		HighHealthDelaySeconds: {
-			Label: High Health Delay Seconds
+			Label: "[i:15] High Health Delay Seconds"
 			Tooltip: The delay in seconds before the boss starts increasing damage on players remaining above the high health threshold.
 		}
 
 		HighHealthDamageIncreasePerSecond: {
-			Label: High Health Damage Increase Per Second
+			Label: "[i:3507] High Health Damage Increase Per Second"
 			Tooltip: The amount of additional damage per second the boss applies once the high health delay has passed.
 		}
 	}
@@ -131,17 +131,17 @@ Configs: {
 		Tooltip: ""
 
 		DealDamageModifierDifference: {
-			Label: Deal Damage Modifier Difference
+			Label: "[i:3507] Deal Damage Modifier Difference"
 			Tooltip: ""
 		}
 
 		TakeDamageModifierDifference: {
-			Label: Take Damage Modifier Difference
+			Label: "[i:89] Take Damage Modifier Difference"
 			Tooltip: ""
 		}
 
 		EqualizeDeathsMode: {
-			Label: Equalize Deaths Mode
+			Label: "[i:321] Equalize Deaths Mode"
 			Tooltip: ""
 		}
 	}

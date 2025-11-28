@@ -1,5 +1,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
+using Terraria;
+using Terraria.Localization;
+using Terraria.ID;
 using Terraria.ModLoader.Config;
 
 namespace DynamicScaling
@@ -46,10 +52,9 @@ namespace DynamicScaling
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ScalingConstant.Tooltip")]
         public float ScalingConstant { get; set; } = 2f;
 
-        [DefaultValue(0f)]
-        [Increment(0.01f)]
+        [DefaultValue("0")]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.BossProgressionThreshold.Tooltip")]
-        public float BossProgressionThreshold { get; set; } = 0f;
+        public string BossProgressionThreshold { get; set; } = "0";
 
         [Header("BossTargetingSettings")]
         [DefaultValue(false)]
@@ -71,10 +76,79 @@ namespace DynamicScaling
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ScalingMultiplier.Tooltip")]
         public float ScalingMultiplier { get; set; } = 0.3f;
 
-        [DefaultValue(0f)]
-        [Increment(0.01f)]
+        [DefaultValue("0")]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ExpectedPlayersBossProgressionThreshold.Tooltip")]
-        public float ExpectedPlayersBossProgressionThreshold { get; set; } = 0f;
+        public string ExpectedPlayersBossProgressionThreshold { get; set; } = "0";
+
+        [JsonIgnore]
+        public float BossProgressionThresholdValue => TryParseThreshold(BossProgressionThreshold, out float v) ? v : 0f;
+
+        [JsonIgnore]
+        public float ExpectedPlayersBossProgressionThresholdValue => TryParseThreshold(ExpectedPlayersBossProgressionThreshold, out float v) ? v : 0f;
+
+        private static bool TryParseThreshold(string input, out float val)
+        {
+            if (float.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out val) && val >= 0f && val < 30f)
+            {
+                return true;
+            }
+            val = 0f;
+            return false;
+        }
+
+        public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref NetworkText message)
+        {
+            var pending = pendingConfig as ServerConfig;
+            if (pending == null)
+                return true;
+
+            bool changed = false;
+            if (!TryParseThreshold(pending.BossProgressionThreshold, out _))
+            {
+                pending.BossProgressionThreshold = "0";
+                changed = true;
+            }
+            if (!TryParseThreshold(pending.ExpectedPlayersBossProgressionThreshold, out _))
+            {
+                pending.ExpectedPlayersBossProgressionThreshold = "0";
+                changed = true;
+            }
+            if (changed)
+            {
+                string reason = "Invalid progression value(s) were reset to 0.";
+                message = NetworkText.FromLiteral(reason);
+                if (Main.netMode == NetmodeID.Server || Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    Main.NewText(reason, Color.Yellow);
+                }
+            }
+            return true;
+        }
+
+        public override void OnChanged()
+        {
+            bool changed = false;
+            if (!TryParseThreshold(BossProgressionThreshold, out _))
+            {
+                BossProgressionThreshold = "0";
+                changed = true;
+            }
+            if (!TryParseThreshold(ExpectedPlayersBossProgressionThreshold, out _))
+            {
+                ExpectedPlayersBossProgressionThreshold = "0";
+                changed = true;
+            }
+            if (changed)
+            {
+                // Persist corrected values and notify players
+                SaveChanges(this, (s, c) => { }, silent: true, broadcast: true);
+                string reason = "Invalid progression value(s) were reset to 0.";
+                if (Main.netMode == NetmodeID.Server || Main.netMode == NetmodeID.SinglePlayer)
+                {
+                    Main.NewText(reason, Color.Yellow);
+                }
+            }
+        }
 
         [Header("BossDynamicDamageScaling")]
         [DefaultValue(0.7f)]
@@ -113,6 +187,7 @@ namespace DynamicScaling
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.WeaponAdaptationAdaptToSoloPlayers.Tooltip")]
         public bool WeaponAdaptationAdaptToSoloPlayers { get; set; } = false;
 
+        [Header("Admin")]
         [DefaultValue(false)]
         public bool DebugMode { get; set; } = false;
 

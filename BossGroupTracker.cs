@@ -184,14 +184,14 @@ namespace DynamicScaling
             try
             {
                 var config = ModContent.GetInstance<ServerConfig>();
-                if (config?.BossProgressionThreshold > 0)
+                if (config?.BossProgressionThresholdValue > 0)
                 {
                     double? prog = GetBossChecklistProgressionForNPC(npc.type);
-                    if (prog.HasValue && prog.Value < config.BossProgressionThreshold)
+                    if (prog.HasValue && prog.Value < config.BossProgressionThresholdValue)
                     {
                         groupData[newGroupId].IsScalingDisabled = true;
                         if (config.DebugMode)
-                            DebugUtil.EmitDebug($"[BossGroupTracker] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThreshold})", Color.Yellow);
+                            DebugUtil.EmitDebug($"[BossGroupTracker] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
                     }
                 }
             }
