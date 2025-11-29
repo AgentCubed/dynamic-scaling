@@ -15,7 +15,7 @@ namespace DynamicScaling
         // Maps npc.whoAmI -> group ID
         private static Dictionary<int, int> npcToGroup = new Dictionary<int, int>();
 
-        // Maps group ID -> boss bar instance
+        // Maps group ID -> BossScaling bar instance
         private static Dictionary<int, IBigProgressBar> groupBars = new Dictionary<int, IBigProgressBar>();
 
         // Maps group ID -> aggregated data
@@ -23,7 +23,7 @@ namespace DynamicScaling
 
         private static int nextGroupId = 0;
 
-        // Reference to the BigProgressBarSystem to look up boss bars
+        // Reference to the BigProgressBarSystem to look up BossScaling bars
         private static BigProgressBarSystem bossBarSystem;
 
         public class BossGroupData
@@ -78,8 +78,8 @@ namespace DynamicScaling
             nextGroupId = 0;
             bossBarSystem = null;
             clientModifiers.Clear();
-            // Clear client caches in GlobalNPC as well
-            ScalingGlobalNPC.ClearClientCaches();
+            // Clear client caches in BossScaling as well
+            BossScaling.ClearClientCaches();
         }
 
         // Public API for other classes (ScalingBossBar, GlobalNPC) to force a rebuild / clear cache
@@ -134,7 +134,7 @@ namespace DynamicScaling
             EvaluateWeaponAdaptationOnInterval(npc, groupData);
         }
 
-        // Register a boss NPC and assign it to a group
+        // Register a BossScaling NPC and assign it to a group
         public static int RegisterBoss(NPC npc)
         {
             if (!npc.boss)
@@ -148,28 +148,28 @@ namespace DynamicScaling
                 return existingGroup;
             }
 
-            // Get boss bar system instance
+            // Get BossScaling bar system instance
             if (bossBarSystem == null)
             {
                 // Access the singleton instance via Main
                 bossBarSystem = Main.BigBossProgressBar;
             }
 
-            // Try to get the appropriate boss bar for this NPC
+            // Try to get the appropriate BossScaling bar for this NPC
             IBigProgressBar bossBar = GetBossBarForNPC(npc);
             if (bossBar == null)
             {
                 return -1;
             }
 
-            // Avoid registering for single-part boss bars that use CommonBossBigProgressBar.
+            // Avoid registering for single-part BossScaling bars that use CommonBossBigProgressBar.
             // We only want group tracking for special/modded multi-part bars.
             if (bossBar is CommonBossBigProgressBar)
             {
                 return -1;
             }
 
-            // Check if any existing group uses this same boss bar
+            // Check if any existing group uses this same BossScaling bar
             int? existingGroupId = FindGroupWithSameBossBar(bossBar, npc);
             if (existingGroupId.HasValue)
             {
@@ -187,7 +187,7 @@ namespace DynamicScaling
                 SpawnTime = Main.time
             };
 
-            // Apply Ignore If Below Progression option: if threshold > 0 and BossChecklist reports the boss progression < threshold, disable scaling
+            // Apply Ignore If Below Progression option: if threshold > 0 and BossChecklist reports the BossScaling progression < threshold, disable scaling
             try
             {
                 var config = ModContent.GetInstance<ServerConfig>();
@@ -198,7 +198,7 @@ namespace DynamicScaling
                     {
                         groupData[newGroupId].IsScalingDisabled = true;
                         if (config.DebugMode)
-                            DebugUtil.EmitDebug($"[BossGroupTracker] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
+                            Utils.EmitDebug($"[BossGroupTracker] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
                     }
                 }
             }
@@ -216,7 +216,7 @@ namespace DynamicScaling
             return newGroupId;
         }
 
-        // Get the boss bar instance for an NPC
+        // Get the BossScaling bar instance for an NPC
         private static IBigProgressBar GetBossBarForNPC(NPC npc)
         {
             // Check if NPC has a custom ModBossBar
@@ -225,13 +225,13 @@ namespace DynamicScaling
                 return npc.BossBar;
             }
 
-            // Check vanilla special boss bars
+            // Check vanilla special BossScaling bars
             if (bossBarSystem != null && bossBarSystem.TryGetSpecialVanillaBossBar(npc.netID, out IBigProgressBar specialBar))
             {
                 return specialBar;
             }
 
-            // Fallback to common boss bar if NPC has a boss head
+            // Fallback to common BossScaling bar if NPC has a BossScaling head
             if (npc.GetBossHeadTextureIndex() != -1)
             {
                 return new CommonBossBigProgressBar();
@@ -240,7 +240,7 @@ namespace DynamicScaling
             return null;
         }
 
-        // Find if any existing group uses the same boss bar type and could include this NPC
+        // Find if any existing group uses the same BossScaling bar type and could include this NPC
         private static int? FindGroupWithSameBossBar(IBigProgressBar bossBar, NPC npc)
         {
             foreach (var kvp in groupBars)
@@ -263,7 +263,7 @@ namespace DynamicScaling
                 if (existingBar.GetType() == bossBar.GetType())
                 {
                     // Need to check if this NPC would validate with the same bar
-                    // For CommonBossBigProgressBar, check if boss heads match
+                    // For CommonBossBigProgressBar, check if BossScaling heads match
                     if (existingBar is CommonBossBigProgressBar)
                     {
                         // Get an active NPC from this group
@@ -311,7 +311,7 @@ namespace DynamicScaling
             return null;
         }
 
-        // Get aggregated boss health by calling ValidateAndCollectNecessaryInfo
+        // Get aggregated BossScaling health by calling ValidateAndCollectNecessaryInfo
         public static bool GetBossHealth(NPC npc, out float life, out float lifeMax)
         {
             life = 0f;
@@ -334,13 +334,13 @@ namespace DynamicScaling
             };
 
             // Call ValidateAndCollectNecessaryInfo to aggregate health
-            // This is the same method the boss bar rendering uses
+            // This is the same method the BossScaling bar rendering uses
             if (!bossBar.ValidateAndCollectNecessaryInfo(ref info))
             {
                 return false;
             }
 
-            // Extract life values from the boss bar's cache
+            // Extract life values from the BossScaling bar's cache
             // ModBossBar and vanilla bars store this in their internal cache
             if (bossBar is ModBossBar modBar)
             {
@@ -463,7 +463,7 @@ namespace DynamicScaling
                 clientAdaptationFactors.Remove(npcWhoAmI);
             }
             // Remove client-side scaling disabled cache if present
-            try { ScalingGlobalNPC.RemoveClientScalingDisabled(npcWhoAmI); } catch { }
+            try { BossScaling.RemoveClientScalingDisabled(npcWhoAmI); } catch { }
         }
 
         // Get all NPCs in the same group
@@ -581,7 +581,7 @@ namespace DynamicScaling
                     var debugConfig = ModContent.GetInstance<ServerConfig>();
                     if (debugConfig?.DebugMode == true)
                     {
-                        DebugUtil.EmitDebug($"[BossGroupTracker] Modifier changed: def {groupData.LastSentDefenseModifier:F2}x -> {groupData.CurrentDefenseModifier:F2}x, off {groupData.LastSentOffenseModifier:F2}x -> {groupData.CurrentOffenseModifier:F2}x", Color.Magenta);
+                        Utils.EmitDebug($"[BossGroupTracker] Modifier changed: def {groupData.LastSentDefenseModifier:F2}x -> {groupData.CurrentDefenseModifier:F2}x, off {groupData.LastSentOffenseModifier:F2}x -> {groupData.CurrentOffenseModifier:F2}x", Color.Magenta);
                     }
 
                     groupData.LastSentDefenseModifier = groupData.CurrentDefenseModifier;
@@ -668,7 +668,7 @@ namespace DynamicScaling
                     Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossBeginningAdaptation", npc.GivenOrTypeName, GetPlayerName(key.playerId), GetWeaponNameFromKey(key.weaponKey)), Color.Orange);
                     if (config?.DebugMode == true)
                     {
-                        DebugUtil.EmitDebug($"{npc.GivenOrTypeName} is analyzing {GetPlayerName(key.playerId)}'s {GetWeaponNameFromKey(key.weaponKey)} (Ratio: {ratio:F2})", Microsoft.Xna.Framework.Color.Orange);
+                        Utils.EmitDebug($"{npc.GivenOrTypeName} is analyzing {GetPlayerName(key.playerId)}'s {GetWeaponNameFromKey(key.weaponKey)} (Ratio: {ratio:F2})", Microsoft.Xna.Framework.Color.Orange);
                     }
                 }
 
@@ -714,7 +714,7 @@ namespace DynamicScaling
             {
                 string playerName = GetPlayerName(key.playerId);
                 string weaponName = GetWeaponNameFromKey(key.weaponKey);
-                DebugUtil.EmitDebug($"{npc.GivenOrTypeName} adapted to {playerName}'s {weaponName} (Factor: {factor:F2})", Microsoft.Xna.Framework.Color.Yellow);
+                Utils.EmitDebug($"{npc.GivenOrTypeName} adapted to {playerName}'s {weaponName} (Factor: {factor:F2})", Microsoft.Xna.Framework.Color.Yellow);
             }
         }
 
@@ -738,7 +738,7 @@ namespace DynamicScaling
                 var onlyKey = groupData.WeaponDamageRunning.Keys.First();
                 string playerName = GetPlayerName(onlyKey.playerId);
                 string weaponName = GetWeaponNameFromKey(onlyKey.weaponKey);
-                DebugUtil.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Orange);
+                Utils.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Orange);
             }
             if (countRunning <= 1 && !allowSingleComboAdaptation)
             {
@@ -778,7 +778,7 @@ namespace DynamicScaling
                 groupData.AdaptationWarned.Add(comboKey);
                 string playerName = GetPlayerName(comboKey.playerId);
                 string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                DebugUtil.EmitDebug($"{npc.GivenOrTypeName} is beginning to adapt to {playerName}'s {weaponName}...", Microsoft.Xna.Framework.Color.Orange);
+                Utils.EmitDebug($"{npc.GivenOrTypeName} is beginning to adapt to {playerName}'s {weaponName}...", Microsoft.Xna.Framework.Color.Orange);
             }
 
             if (ratio >= completeMultiplier && phaseTooFast)
@@ -795,7 +795,7 @@ namespace DynamicScaling
                             }
                         string playerName = GetPlayerName(comboKey.playerId);
                         string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                        DebugUtil.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Yellow);
+                        Utils.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Yellow);
                     }
                 }
                 else
@@ -807,7 +807,7 @@ namespace DynamicScaling
                     }
                     string playerName = GetPlayerName(comboKey.playerId);
                     string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                    DebugUtil.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Yellow);
+                    Utils.EmitDebug($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Microsoft.Xna.Framework.Color.Yellow);
                 }
             }
             else
@@ -817,7 +817,7 @@ namespace DynamicScaling
                     string playerName = GetPlayerName(comboKey.playerId);
                     string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
                     string reason = ratio < completeMultiplier ? $"ratio {ratio:F2} < {completeMultiplier:F2}" : "phase not too fast";
-                    DebugUtil.EmitDebug($"{npc.GivenOrTypeName} did not adapt to {playerName}'s {weaponName}: {reason}", Microsoft.Xna.Framework.Color.Gray);
+                    Utils.EmitDebug($"{npc.GivenOrTypeName} did not adapt to {playerName}'s {weaponName}: {reason}", Microsoft.Xna.Framework.Color.Gray);
                 }
             }
         }
@@ -833,7 +833,7 @@ namespace DynamicScaling
             if (comboCount <= 1)
             {
                 if (config?.DebugMode == true)
-                    DebugUtil.EmitDebug($"{npc.GivenOrTypeName} adaptation: not enough combos to evaluate proximity (count={comboCount})", Microsoft.Xna.Framework.Color.Gray);
+                    Utils.EmitDebug($"{npc.GivenOrTypeName} adaptation: not enough combos to evaluate proximity (count={comboCount})", Microsoft.Xna.Framework.Color.Gray);
                 return;
             }
 
@@ -862,7 +862,7 @@ namespace DynamicScaling
                 double dmgPerMinute = comboDmg / Math.Max(phaseDurationMinutes, 1e-6);
                 string proximityMsg = $"{playerName}'s {weaponName}: ratio={ratio:F2} (start={startMultiplier:F2},complete={completeMultiplier:F2}) {closeness:F1}% to complete, {comboDmg:F0} dmg this phase (~{dmgPerMinute:F1}/min)";
                 if (config?.DebugMode == true)
-                    DebugUtil.EmitDebug($"{npc.GivenOrTypeName} adaptation check: {proximityMsg}", Microsoft.Xna.Framework.Color.Gray);
+                    Utils.EmitDebug($"{npc.GivenOrTypeName} adaptation check: {proximityMsg}", Microsoft.Xna.Framework.Color.Gray);
             }
         }
 
@@ -884,7 +884,7 @@ namespace DynamicScaling
             }
 
             if (config?.DebugMode == true)
-                DebugUtil.EmitDebug($"{(int)(hpPercent * FullHealthPercent)}% HP | {paceMessage} | {displayDefMod:F2}x Def", Microsoft.Xna.Framework.Color.Gray);
+                Utils.EmitDebug($"{(int)(hpPercent * FullHealthPercent)}% HP | {paceMessage} | {displayDefMod:F2}x Def", Microsoft.Xna.Framework.Color.Gray);
         }
 
         private static string GetPlayerName(int playerId)
@@ -928,7 +928,7 @@ namespace DynamicScaling
                 }
                 if (result == null)
                     return null;
-                var normalized = BossChecklistUtils.NormalizeBossChecklistReturn(result);
+                var normalized = BossChecklist.NormalizeBossChecklistReturn(result);
                 if (normalized != null)
                 {
                     foreach (var kv in normalized)
@@ -982,5 +982,5 @@ namespace DynamicScaling
             }
         }
 
-        // Use BossChecklistUtils.NormalizeBossChecklistReturn instead (shared helper)
+        // Use BossChecklist.NormalizeBossChecklistReturn instead (shared helper)
     }

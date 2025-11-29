@@ -1,1 +1,41 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+[h1]Dynamic Scaling[/h1]
+
+[b]A mod with both server and client components that dynamically adjusts boss difficulty and player damage.[/b]
+
+[h2]What it does[/h2]
+[list]
+[*]Adjusts boss offense/defense based on fight pace vs an expected duration (`ExpectedTotalMinutes`).
+[*]Optional weapon adaptation that nerfs dominant player+weapon combos.
+[*]Configurable player damage modifiers and per-player overrides (`DealDamage`, `TakeDamage`, `PlayerOverrides`).
+[*]Expected-players scaling increases or decreases damage when fewer players are nearby.
+[*]Equalize deaths mode balances difficulty based on deaths and time in-fight.
+[*]High-health damage scaling increases player damage taken when players stay above a health threshold for too long during boss fights.
+[/list]
+
+[h2]Quick install & usage[/h2]
+[list]
+[*]Install the mod on your server or client (supports both sides).
+[*]Open tModLoader -> Mod Config -> DynamicScaling (Server) to tune server-only options.
+[*]Set `ExpectedTotalMinutes = 0` to disable time-based boss scaling.
+[*]Enable `WeaponAdaptationEnabled` to activate weapon adaptation behavior.
+[*]Configure high health damage scaling with `HighHealthThreshold`, `HighHealthDelaySeconds`, etc.
+[/list]
+
+[h2]Configuration highlights[/h2]
+[list]
+[*][b]ExpectedTotalMinutes[/b]: Target boss fight duration in minutes (0 disables).
+[*][b]MaxDefenseModifier[/b]: Max defense multiplier applied when boss is dying too quickly.
+[*][b]WeaponAdaptationStartMultiplier[/b], [b]WeaponAdaptationCompleteMultiplier[/b]: thresholds for adaptation.
+[*][b]ExpectedPlayers[/b], [b]ScalingMultiplier[/b]: control expected-player scaling.
+[*][b]DealDamage[/b], [b]TakeDamage[/b]: global player damage tuning.
+[*][b]HighHealthThreshold[/b], [b]HighHealthDelaySeconds[/b], [b]HighHealthDamageIncreasePerSecond[/b], [b]HighHealthDamageMaximum[/b]: control high health damage scaling.
+[*][b]DebugMode[/b]: show diagnostic messages in-game.
+[/list]
+
+[h2]Notes[/h2]
+[list]
+[*]This mod is server-side and intended to be configured per-server.
+[*]For a technical explanation and formulas, see the included `README.md` in the mod folder.
+[/list]
+
+[url=https://github.com/AgentCubed/dynamic-scaling]Source & details on GitHub[/url]

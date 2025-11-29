@@ -1,1 +1,22 @@
-Modify this file with a description of your mod.
+Dynamic Scaling
+
+A refactor of the original DamageEditor that dynamically adjusts boss difficulty and player damage in real-time.
+
+Key features:
+- Dynamic boss pacing: adjusts boss offense/defense based on how fast or slow the fight is relative to an expected duration (`ExpectedTotalMinutes`).
+- Weapon adaptation: detects dominant player+weapon combos and reduces their effectiveness to prevent strategy-stomping (optional).
+- Player damage scaling: configurable global and per-player modifiers for damage dealt and taken (`DealDamage`, `TakeDamage`, `PlayerOverrides`).
+- Expected players scaling: increases incoming or boss damage when fewer players are nearby than `ExpectedPlayers`.
+- Equalize deaths mode: balances difficulty across players by scaling damage based on deaths and time.
+- High-health damage scaling: optional mechanic that increases player damage taken when players remain above a health threshold for too long during boss fights.
+- Server-side config with debug messages and fine-grained tuning.
+
+Usage:
+-- Install on the server or client (mod includes server and client components). Configure via tModLoader Mod Config (Server side) or by editing config files.
+-- Set `ExpectedTotalMinutes` to 0 to disable boss time-based scaling.
+-- `WeaponAdaptationEnabled` toggles adaptation behavior.
+-- High health damage scaling can be configured with `HighHealthThreshold`, `HighHealthDelaySeconds`, `HighHealthDamageIncreasePerSecond`, and `HighHealthDamageMaximum`.
+
+For full technical details and design math, see the mod `README.md` in the source or visit the project page:
+
+https://github.com/AgentCubed/dynamic-scaling

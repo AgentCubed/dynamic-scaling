@@ -8,9 +8,9 @@ namespace DynamicScaling
 {
     /// <summary>
     /// GlobalBossBar for displaying boss health. This is CLIENT-SIDE ONLY and used for rendering.
-    /// For game logic calculations, use ScalingBossBar.TryGetBossHealth which works server-side for aggregation and falls back to npc.life for single-part bosses.
+    /// For game logic calculations, use BossBar.TryGetBossHealth which works server-side for aggregation and falls back to npc.life for single-part bosses.
     /// </summary>
-    public class ScalingBossBar : GlobalBossBar
+    public class BossBar : GlobalBossBar
     {
         public override bool PreDraw(SpriteBatch spriteBatch, NPC npc, ref BossBarDrawParams drawParams)
         {

@@ -4,42 +4,42 @@ Configs: {
 
 		DealDamage: {
 			Label: "[i:3507] Schaden (ausgehend)"
-			Tooltip: "Verändert den vom Spieler an Gegnern verursachten Schaden. Verwendet den Multiplikator 1.2^x, wobei x der Wert ist (0 = keine Änderung)."
+			Tooltip: Verändert den vom Spieler an Gegnern verursachten Schaden. Verwendet den Multiplikator 1.2^x, wobei x der Wert ist (0 = keine Änderung).
 		}
 
 		TakeDamage: {
 			Label: "[i:89] Schaden erhalten"
-			Tooltip: "Verändert den vom Spieler erlittenen Schaden. Verwendet den Multiplikator 1.2^x, wobei x der Wert ist (0 = keine Änderung)."
+			Tooltip: Verändert den vom Spieler erlittenen Schaden. Verwendet den Multiplikator 1.2^x, wobei x der Wert ist (0 = keine Änderung).
 		}
 
 		EqualizeDeathsMode: {
 			Label: "[i:321] Todesausgleich-Modus"
-			Tooltip: "Erhöht den erlittenen Schaden für Spieler, die während Bosskämpfen weniger Tode als der Durchschnitt haben. Falls alle Spieler tot sind, steigt der Schaden zeitabhängig exponentiell an."
+			Tooltip: Erhöht den erlittenen Schaden für Spieler, die während Bosskämpfen weniger Tode als der Durchschnitt haben. Falls alle Spieler tot sind, steigt der Schaden zeitabhängig exponentiell an.
 		}
 
 		ExpectedTotalMinutes: {
 			Label: "[i:15] Erwartete Gesamtdauer (Min)"
-			Tooltip: "Erwartete Zeit in Minuten für einen Bosskampf. Der Boss passt seine Verteidigung dynamisch an, um diese Dauer anzustreben. Auf 0 setzen, um die Skalierung zu deaktivieren."
+			Tooltip: Erwartete Zeit in Minuten für einen Bosskampf. Der Boss passt seine Verteidigung dynamisch an, um diese Dauer anzustreben. Auf 0 setzen, um die Skalierung zu deaktivieren.
 		}
 
 		MaxDefenseModifier: {
 			Label: "[i:156] Maximaler Verteidigungsmodifikator"
-			Tooltip: "Maximaler Betrag, um den der Boss seine Verteidigung erhöhen kann, um Schaden zu reduzieren und den Kampf zu verlängern."
+			Tooltip: Maximaler Betrag, um den der Boss seine Verteidigung erhöhen kann, um Schaden zu reduzieren und den Kampf zu verlängern.
 		}
 
 		ScalingConstant: {
 			Label: "[i:149] Skalierungskonstante"
-			Tooltip: "Bestimmt, wie schnell die Bossverteidigung basierend auf der zeitlichen Abweichung zunimmt. Höhere Werte machen die Skalierung aggressiver."
+			Tooltip: Bestimmt, wie schnell die Bossverteidigung basierend auf der zeitlichen Abweichung zunimmt. Höhere Werte machen die Skalierung aggressiver.
 		}
 
 		BossProgressionThreshold: {
 			Label: "[i:43] Deaktivieren unter diesem Fortschrittswert"
-			Tooltip: "Die Zeit-Skalierung gilt nicht für Bosse mit einem BossChecklist-Fortschrittswert unter diesem Schwellenwert. 0 deaktiviert diese Prüfung. Verwende /dumpprogression, um Werte aus BossChecklist anzuzeigen."
+			Tooltip: Die Zeit-Skalierung gilt nicht für Bosse mit einem BossChecklist-Fortschrittswert unter diesem Schwellenwert. 0 deaktiviert diese Prüfung. Verwende /dumpprogression, um Werte aus BossChecklist anzuzeigen.
 		}
 
 		TargetHighestHealth: {
 			Label: "[i:58] Auf höchsten Lebenswert zielen"
-			Tooltip: "Veranlasst Bosse, vorrangig den Spieler mit dem höchsten aktuellen Leben anzugreifen."
+			Tooltip: Veranlasst Bosse, vorrangig den Spieler mit dem höchsten aktuellen Leben anzugreifen.
 		}
 
 		DebugMode: {
@@ -49,22 +49,22 @@ Configs: {
 
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Nicht auf niedrigstes Ziel anvisieren"
-			Tooltip: "Verhindert, dass Bosse Spieler anvisieren, deren aktuelles Leben innerhalb von 20 LP des Spielers mit dem niedrigsten Leben in Reichweite liegt."
+			Tooltip: Verhindert, dass Bosse Spieler anvisieren, deren aktuelles Leben innerhalb von 20 LP des Spielers mit dem niedrigsten Leben in Reichweite liegt.
 		}
 
 		ExpectedPlayers: {
 			Label: "[i:966] Erwartete Spieleranzahl"
-			Tooltip: "Erwartete Anzahl an Spielern für Bosskämpfe. Wenn weniger Spieler präsent sind, erhöht der Boss seinen Schaden und seine Verteidigung."
+			Tooltip: Erwartete Anzahl an Spielern für Bosskämpfe. Wenn weniger Spieler präsent sind, erhöht der Boss seinen Schaden und seine Verteidigung.
 		}
 
 		ExpectedPlayersBossProgressionThreshold: {
 			Label: "[i:43] Deaktivieren unter diesem Fortschrittswert"
-			Tooltip: "Die Skalierung für erwartete Spieler gilt nicht für Bosse mit einem BossChecklist-Fortschrittswert unter diesem Schwellenwert. 0 zum Deaktivieren."
+			Tooltip: Die Skalierung für erwartete Spieler gilt nicht für Bosse mit einem BossChecklist-Fortschrittswert unter diesem Schwellenwert. 0 zum Deaktivieren.
 		}
 
 		ScalingMultiplier: {
 			Label: "[i:184] Skalierungs-Multiplikator"
-			Tooltip: "Multiplikator für zusätzlichen Schaden und Verteidigung, den der Boss erhält, wenn weniger als die erwarteten Spieler kämpfen."
+			Tooltip: Multiplikator für zusätzlichen Schaden und Verteidigung, den der Boss erhält, wenn weniger als die erwarteten Spieler kämpfen.
 		}
 
 		WeaponAdaptationEnabled: {
@@ -89,12 +89,12 @@ Configs: {
 
 		WeaponAdaptationMaxReduction: {
 			Label: "[i:3507] Maximale Reduktion (Waffenanpassung)"
-			Tooltip: "Steuert, wie aggressiv Waffen in Richtung des Durchschnitts abgeschwächt werden. 0 = keine Änderung, 1 = Waffe wird auf den durchschnittlichen Schadenswert geschwächt."
+			Tooltip: Steuert, wie aggressiv Waffen in Richtung des Durchschnitts abgeschwächt werden. 0 = keine Änderung, 1 = Waffe wird auf den durchschnittlichen Schadenswert geschwächt.
 		}
 
 		WeaponAdaptationAdaptToSoloPlayers: {
 			Label: "[i:3507] An Einzelspieler anpassen"
-			Tooltip: "Erlaubt Bossen, sich an die Waffen-Kombination eines einzelnen Spielers anzupassen."
+			Tooltip: Erlaubt Bossen, sich an die Waffen-Kombination eines einzelnen Spielers anzupassen.
 		}
 
 		PlayerOverrides: {
@@ -109,22 +109,28 @@ Configs: {
 			BossGroupSettings: "[i:966] Einstellungen für Boss-Gruppen"
 			WeaponAdaptation: "[i:3507] Waffenanpassung"
 			BossDynamicDamageScaling: "[i:184] Dynamische Schadensskalierung (Boss)"
+			PlayerHighHealthDamageScaling: "[i:184] Spieler High-Health Schadensskalierung"
 			Admin: Admin-Einstellungen
 		}
 
 		HighHealthThreshold: {
 			Label: "[i:58] Schwelle für hohes Leben"
-			Tooltip: "Spieler über diesem Prozentwert gelten als hoch im Leben. Wenn sie nahe am Boss sind, wird die Zeit über dieser Schwelle erfasst."
+			Tooltip: Spieler über diesem Prozentwert gelten als hoch im Leben. Wenn sie nahe am Boss sind, wird die Zeit über dieser Schwelle erfasst.
 		}
 
 		HighHealthDelaySeconds: {
 			Label: "[i:15] Verzögerung bei hohem Leben (Sek.)"
-			Tooltip: "Die Verzögerung in Sekunden, bevor der Boss den Schaden an Spielern erhöht, die über der Schwelle für hohes Leben bleiben."
+			Tooltip: Die Verzögerung in Sekunden, bevor der Boss den Schaden an Spielern erhöht, die über der Schwelle für hohes Leben bleiben.
 		}
 
 		HighHealthDamageIncreasePerSecond: {
 			Label: "[i:3507] Zusätzlicher Schaden pro Sekunde bei hohem Leben"
-			Tooltip: "Die zusätzliche Schadensmenge pro Sekunde, die der Boss anwendet, nachdem die Verzögerung verstrichen ist."
+			Tooltip: Die zusätzliche Schadensmenge pro Sekunde, die der Boss anwendet, nachdem die Verzögerung verstrichen ist.
+		}
+
+		HighHealthDamageMaximum: {
+			Label: "[i:89] Maximaler zusätzlicher Schaden (High-Health)"
+			Tooltip: Der maximale zusätzliche Flutschaden, den ein Spieler durch die High-Health-Skalierung erhalten kann.
 		}
 	}
 
@@ -150,6 +156,6 @@ Configs: {
 	Messages: {
 		BossBeginningAdaptation: "{0} beginnt, sich an {2} von {1} anzupassen..."
 		BossAdapted: "{0} hat sich an {2} von {1} angepasst."
-		InvalidProgressionValue: "Ungültige Progressionswerte wurden auf 0 zurückgesetzt."
+		InvalidProgressionValue: Ungültige Progressionswerte wurden auf 0 zurückgesetzt.
 	}
 }

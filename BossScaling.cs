@@ -12,13 +12,12 @@ using Terraria.ModLoader.IO;
 
 namespace DynamicScaling
 {
-    public class ScalingGlobalNPC : GlobalNPC
+    public class BossScaling : GlobalNPC
     {
         private const double DefaultExpectedMinutes = 4.0;
         private const double DeadZoneDivisor = 5.0;
         private const int HitPointBuckets = 10;
         private const int FullHealthPercent = 100;
-        private const float Range = 300f * 16f;
         private const int AggroBoost = 1500;
         private const int HealthThreshold = 20;
 
@@ -88,12 +87,12 @@ namespace DynamicScaling
                 {
                     if (!isScalingDisabled && config?.BossProgressionThresholdValue > 0)
                     {
-                        double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
+                        double? prog = BossChecklist.GetBossChecklistProgressionForNPC(npc.type);
                         if (prog.HasValue && prog.Value < config.BossProgressionThresholdValue)
                         {
                             isScalingDisabled = true;
                             if (config.DebugMode)
-                                DebugUtil.EmitDebug($"[ScalingGlobalNPC] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
+                                Utils.EmitDebug($"[Boss] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
                         }
                     }
                 }
@@ -112,7 +111,7 @@ namespace DynamicScaling
 
                 // Register for group-based tracking only if this boss has a special boss bar
                 try { BossGroupTracker.RegisterBoss(npc); } catch { }
-                ScalingBossBar.ClearCache();
+                BossBar.ClearCache();
             }
         }
 
@@ -226,7 +225,7 @@ namespace DynamicScaling
             if (npcWhoAmI < 0 || npcWhoAmI >= Main.maxNPCs) return;
             var npc = Main.npc[npcWhoAmI];
             if (npc == null || !npc.active || !npc.boss) return;
-            var g = npc.GetGlobalNPC<ScalingGlobalNPC>();
+            var g = npc.GetGlobalNPC<BossScaling>();
             if (g == null) return;
             g.RecordComboDamage(npc, playerId, weaponKey, amount);
         }
@@ -247,7 +246,7 @@ namespace DynamicScaling
                     continue;
                 }
 
-                npc.GetGlobalNPC<ScalingGlobalNPC>().PlayerDeathsThisFight++;
+                npc.GetGlobalNPC<BossScaling>().PlayerDeathsThisFight++;
             }
         }
 
@@ -261,7 +260,7 @@ namespace DynamicScaling
                     continue;
                 }
 
-                return npc.GetGlobalNPC<ScalingGlobalNPC>().PlayerDeathsThisFight;
+                return npc.GetGlobalNPC<BossScaling>().PlayerDeathsThisFight;
             }
 
             return 0;
@@ -271,12 +270,10 @@ namespace DynamicScaling
         {
             if (npc.boss)
             {
-                ScalingBossBar.ClearCache();
+                BossBar.ClearCache();
                 try { BossGroupTracker.CleanupDeadNPC(npc.whoAmI); } catch { }
             }
         }
-
-        
 
         private void ResetForNewBoss()
         {
@@ -343,7 +340,7 @@ namespace DynamicScaling
             }
 
             double hpPercent;
-            if (ScalingBossBar.TryGetBossHealth(npc.whoAmI, out float life, out float lifeMax) && lifeMax > 0)
+            if (BossBar.TryGetBossHealth(npc.whoAmI, out float life, out float lifeMax) && lifeMax > 0)
             {
                 hpPercent = life / lifeMax;
             }
@@ -366,7 +363,7 @@ namespace DynamicScaling
             var config = ModContent.GetInstance<ServerConfig>();
             if (config != null && config.ExpectedPlayers > 1)
             {
-                int nearbyPlayers = GetPlayersNearby(npc.Center, Range);
+                int nearbyPlayers = BossProximityCache.GetNearbyPlayerCount(npc);
                 if (nearbyPlayers < config.ExpectedPlayers)
                 {
                     float diff = config.ExpectedPlayers - nearbyPlayers;
@@ -379,21 +376,6 @@ namespace DynamicScaling
                     }
                 }
             }
-        }
-
-        public static int GetPlayersNearby(Vector2 center, float range)
-        {
-            int count = 0;
-            float rangeSq = range * range;
-            for (int i = 0; i < Main.maxPlayers; i++)
-            {
-                Player p = Main.player[i];
-                if (p.active && !p.dead && Vector2.DistanceSquared(p.Center, center) < rangeSq)
-                {
-                    count++;
-                }
-            }
-            return count;
         }
 
         public override void ModifyHitByItem(NPC npc, Player player, Item item, ref NPC.HitModifiers modifiers)
@@ -934,13 +916,10 @@ namespace DynamicScaling
                     if (curP != null && curP.active && !curP.dead)
                     {
                         int lowestHealth = Main.player[lowestPlayer].statLife;
-                        float rangeSqLocal = Range * Range;
-                        if (Vector2.DistanceSquared(npc.Center, curP.Center) > rangeSqLocal)
+                        if (Vector2.DistanceSquared(npc.Center, curP.Center) > BossProximityCache.BossRangeSq)
                         {
-                            // Current target not within the 300-block range; don't invalidate
                             return base.PreAI(npc);
                         }
-                        // Old: 30% HP-based invalidation removed. We now only invalidate if current target is near lowest health.
                         if (Math.Abs(curP.statLife - lowestHealth) <= HealthThreshold)
                         {
                             npc.target = 255;
@@ -990,7 +969,7 @@ namespace DynamicScaling
 
                 float distance = Vector2.Distance(npc.Center, player.Center);
 
-                if (distance <= Range)
+                if (distance <= BossProximityCache.BossRange)
                 {
                     if (player.statLife > highestHealth || (player.statLife == highestHealth && distance < bestDistance))
                     {
@@ -1020,7 +999,7 @@ namespace DynamicScaling
 
                 float distance = Vector2.Distance(npc.Center, player.Center);
 
-                if (distance <= Range)
+                if (distance <= BossProximityCache.BossRange)
                 {
                     if (player.statLife < lowestHealth || (player.statLife == lowestHealth && distance < bestDistance))
                     {

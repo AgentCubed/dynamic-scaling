@@ -6,7 +6,7 @@ using Terraria.ID;
 
 namespace DynamicScaling
 {
-    internal static class DebugUtil
+    internal static class Utils
     {
         public static void EmitDebug(string message, Color color)
         {

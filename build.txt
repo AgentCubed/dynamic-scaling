@@ -1,4 +1,7 @@
 displayName = Dynamic Scaling
 author = AgentCubed
-version = 0.1.0
+version = 0.1.1
+homepage = https://github.com/AgentCubed/dynamic-scaling
 weakReferences = BossChecklist
+hideCode = false
+hideResources = false

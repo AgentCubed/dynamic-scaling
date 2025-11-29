@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace DynamicScaling
 {
-    internal static class BossChecklistUtils
+    internal static class BossChecklist
     {
         public static Dictionary<string, IDictionary<string, object>> NormalizeBossChecklistReturn(object result)
         {

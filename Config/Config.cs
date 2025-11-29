@@ -150,18 +150,24 @@ namespace DynamicScaling
             }
         }
 
-        [Header("BossDynamicDamageScaling")]
+        [Header("PlayerHighHealthDamageScaling")]
         [DefaultValue(0.7f)]
         [Range(0f, 1f)]
         public float HighHealthThreshold { get; set; } = 0.7f;
 
-        [DefaultValue(60)]
+        [DefaultValue(10)]
         [Range(0, 600)]
-        public int HighHealthDelaySeconds { get; set; } = 60;
+        public int HighHealthDelaySeconds { get; set; } = 10;
 
-        [DefaultValue(0.05f)]
-        [Range(0f, 1f)]
-        public float HighHealthDamageIncreasePerSecond { get; set; } = 0.05f;
+        [DefaultValue(1)]
+        [Range(0, 100)]
+        [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.HighHealthDamageIncreasePerSecond.Tooltip")]
+        public int HighHealthDamageIncreasePerSecond { get; set; } = 1;
+
+        [DefaultValue(100)]
+        [Range(0, 1000)]
+        [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.HighHealthDamageMaximum.Tooltip")]
+        public int HighHealthDamageMaximum { get; set; } = 100;
 
         [Header("WeaponAdaptation")]
         [DefaultValue(false)]
@@ -193,9 +199,11 @@ namespace DynamicScaling
 
         public class PlayerTuning
         {
+            [Range(-10, 10)]
             [DefaultValue(0)]
             public int DealDamageModifierDifference { get; set; } = 0;
 
+            [Range(-10, 10)]
             [DefaultValue(0)]
             public int TakeDamageModifierDifference { get; set; } = 0;
 

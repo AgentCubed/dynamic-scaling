@@ -109,6 +109,7 @@ Configs: {
 			BossGroupSettings: "[i:966] 首領群組設定"
 			WeaponAdaptation: "[i:3507] 武器自適應"
 			BossDynamicDamageScaling: "[i:184] 首領動態傷害縮放"
+			PlayerHighHealthDamageScaling: "[i:184] 玩家高生命額外傷害縮放"
 			Admin: 管理者設定
 		}
 
@@ -125,6 +126,11 @@ Configs: {
 		HighHealthDamageIncreasePerSecond: {
 			Label: "[i:3507] 高生命每秒額外傷害"
 			Tooltip: "延遲結束後，首領每秒新增施加的傷害量。"
+		}
+
+		HighHealthDamageMaximum: {
+			Label: "[i:89] 高生命額外傷害上限"
+			Tooltip: "由高生命縮放施加給玩家的額外傷害最大值（上限）。"
 		}
 	}
 

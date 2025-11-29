@@ -109,6 +109,7 @@ Configs: {
 			BossGroupSettings: "[i:966] Boss Group Settings"
 			WeaponAdaptation: "[i:3507] Weapon Adaptation"
 			BossDynamicDamageScaling: "[i:184] Boss Dynamic Damage Scaling"
+			PlayerHighHealthDamageScaling: "[i:184] Player High Health Damage Scaling"
 			Admin: Admin Settings
 		}
 
@@ -125,6 +126,11 @@ Configs: {
 		HighHealthDamageIncreasePerSecond: {
 			Label: "[i:3507] High Health Damage Increase Per Second"
 			Tooltip: The amount of additional damage per second the boss applies once the high health delay has passed.
+		}
+
+		HighHealthDamageMaximum: {
+			Label: "[i:89] High Health Damage Maximum"
+			Tooltip: Maximum additional flat damage a player can take from the high-health damage scaling (cap).
 		}
 	}
 
@@ -148,8 +154,8 @@ Configs: {
 	}
 
 	Messages: {
-		BossBeginningAdaptation: "{0} is beginning to adapt to {1}'s {2}...",
-		BossAdapted: "{0} has adapted to {1}'s {2}.",
-		InvalidProgressionValue: "Invalid progression value(s) were reset to 0."
+		BossBeginningAdaptation: "{0} is beginning to adapt to {1}'s {2}..."
+		BossAdapted: "{0} has adapted to {1}'s {2}."
+		InvalidProgressionValue: Invalid progression value(s) were reset to 0.
 	}
 }

@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace DynamicScaling
 {
-    public class ScalingPlayer : ModPlayer
+    public class PlayerScaling : ModPlayer
     {
         // --- Static Tuning Variables ---
         private const double TICK_INTENSITY = 0.0003;
@@ -23,6 +23,7 @@ namespace DynamicScaling
         private static uint lastStateUpdateFrame = uint.MaxValue;
 
         private int deathsThisBossFight = 0;
+        private int ticksAboveHealthThreshold = 0;
 
         public int DeathsThisBossFight => deathsThisBossFight;
 
@@ -51,7 +52,7 @@ namespace DynamicScaling
         private int GetDealModification(ServerConfig config, ServerConfig.PlayerTuning? tuning)
         {
             int offset = tuning?.DealDamageModifierDifference ?? 0;
-            return config.DealDamage + deathsThisBossFight + offset;
+            return config.DealDamage - deathsThisBossFight + offset;
         }
 
         private int GetTakeModification(ServerConfig config, ServerConfig.PlayerTuning? tuning)
@@ -77,8 +78,8 @@ namespace DynamicScaling
             if (Main.CurrentFrameFlags.AnyActiveBossNPC)
             {
                 deathsThisBossFight++;
-                ScalingGlobalNPC.RecordBossDeath();
-                int totalDeaths = ScalingGlobalNPC.TotalBossDeaths;
+                BossScaling.RecordBossDeath();
+                int totalDeaths = BossScaling.TotalBossDeaths;
 
                 var config = ModContent.GetInstance<ServerConfig>();
                 if (config?.DebugMode == true)
@@ -111,14 +112,15 @@ namespace DynamicScaling
                 float multiplier = GetTakeDamageMultiplier(totalModification);
                 modifiers.IncomingDamageMultiplier *= multiplier;
             }
-            
+
+            ApplyHighHealthDamageScaling(ref modifiers, config);
             ApplyExpectedPlayersScaling(ref modifiers, config);
 
             if (Main.CurrentFrameFlags.AnyActiveBossNPC && equalizeDeathsMode)
             {
                 // Mirror original DamageEditor behavior: always update shared fight state each hit.
                 UpdateSharedFightState();
-                int totalDeaths = ScalingGlobalNPC.GetCurrentFightDeathCount();
+                int totalDeaths = BossScaling.GetCurrentFightDeathCount();
                 double equalizedMultiplier = GetCombinedDamageMultiplier(
                     cumulativeShortHandedTickCounter,
                     cachedAlivePlayers,
@@ -142,13 +144,14 @@ namespace DynamicScaling
                 modifiers.IncomingDamageMultiplier *= multiplier;
             }
 
+            ApplyHighHealthDamageScaling(ref modifiers, config);
             ApplyExpectedPlayersScaling(ref modifiers, config);
 
             if (Main.CurrentFrameFlags.AnyActiveBossNPC && equalizeDeathsMode)
             {
                 // Mirror original DamageEditor behavior: always update shared fight state each hit.
                 UpdateSharedFightState();
-                int totalDeaths = ScalingGlobalNPC.GetCurrentFightDeathCount();
+                int totalDeaths = BossScaling.GetCurrentFightDeathCount();
                 double equalizedMultiplier = GetCombinedDamageMultiplier(
                     cumulativeShortHandedTickCounter,
                     cachedAlivePlayers,
@@ -157,6 +160,39 @@ namespace DynamicScaling
                     deathsThisBossFight);
 
                 modifiers.IncomingDamageMultiplier *= (float)equalizedMultiplier;
+            }
+        }
+
+        private void ApplyHighHealthDamageScaling(ref Player.HurtModifiers modifiers, ServerConfig config)
+        {
+            if (!Main.CurrentFrameFlags.AnyActiveBossNPC)
+                return;
+
+            if (config.HighHealthThreshold <= 0 || config.HighHealthDamageIncreasePerSecond <= 0)
+                return;
+
+            if (!BossProximityCache.IsPlayerNearAnyBoss(Player))
+                return;
+
+            int delayTicks = config.HighHealthDelaySeconds * TICKS_PER_SECOND;
+            if (ticksAboveHealthThreshold <= delayTicks)
+                return;
+
+            int ticksOverDelay = ticksAboveHealthThreshold - delayTicks;
+            float secondsOverDelay = ticksOverDelay / (float)TICKS_PER_SECOND;
+            int additionalDamage = (int)(secondsOverDelay * config.HighHealthDamageIncreasePerSecond);
+            // Cap additional damage to configured maximum
+            additionalDamage = Math.Min(additionalDamage, config.HighHealthDamageMaximum);
+
+            if (additionalDamage > 0)
+            {
+                modifiers.FinalDamage.Base += additionalDamage;
+
+                if (config.DebugMode)
+                {
+                    float hpPercent = (float)Player.statLife / Player.statLifeMax2;
+                    Main.NewText($"[HighHealth] {Player.name} taking +{additionalDamage} damage (HP {hpPercent:P0} >= {config.HighHealthThreshold:P0} for {secondsOverDelay:F1}s over delay)", Color.Orange);
+                }
             }
         }
 
@@ -177,7 +213,7 @@ namespace DynamicScaling
                     NPC npc = Main.npc[i];
                     if (npc.active && npc.boss)
                     {
-                        double? prog = BossChecklistUtils.GetBossChecklistProgressionForNPC(npc.type);
+                        double? prog = BossChecklist.GetBossChecklistProgressionForNPC(npc.type);
                         if (prog.HasValue && prog.Value < config.ExpectedPlayersBossProgressionThresholdValue)
                         {
                             hasLowProgressionBoss = true;
@@ -191,29 +227,10 @@ namespace DynamicScaling
                 }
             }
 
-            // Find closest boss
-            NPC? closestBoss = null;
-            float closestDistSq = float.MaxValue;
-            float range = 300f * 16f; // Same as GlobalNPC.Range
-            float rangeSq = range * range;
-
-            for (int i = 0; i < Main.maxNPCs; i++)
+            // Find closest boss using cache
+            if (BossProximityCache.TryGetClosestBoss(Player, out NPC? closestBoss) && closestBoss != null)
             {
-                NPC npc = Main.npc[i];
-                if (npc.active && npc.boss)
-                {
-                    float distSq = Vector2.DistanceSquared(Player.Center, npc.Center);
-                    if (distSq < closestDistSq)
-                    {
-                        closestDistSq = distSq;
-                        closestBoss = npc;
-                    }
-                }
-            }
-
-            if (closestBoss != null && closestDistSq < rangeSq)
-            {
-                int nearbyPlayers = ScalingGlobalNPC.GetPlayersNearby(closestBoss.Center, range);
+                int nearbyPlayers = BossProximityCache.GetNearbyPlayerCount(closestBoss);
                 if (nearbyPlayers < config.ExpectedPlayers)
                 {
                     float diff = config.ExpectedPlayers - nearbyPlayers;
@@ -233,19 +250,42 @@ namespace DynamicScaling
                 UpdateSharedFightState();
             }
 
-            // If stacks exist but no active boss NPCs are present this frame, reset.
-            if (deathsThisBossFight > 0 && !Main.CurrentFrameFlags.AnyActiveBossNPC)
-            {
-                deathsThisBossFight = 0;
+            var config = ModContent.GetInstance<ServerConfig>();
 
-                var config = ModContent.GetInstance<ServerConfig>();
-                if (config?.DebugMode == true)
+            // Track time above health threshold during boss fights when player is near a boss
+            if (Main.CurrentFrameFlags.AnyActiveBossNPC)
+            {
+                if (BossProximityCache.IsPlayerNearAnyBoss(Player))
                 {
-                    Main.NewText("Boss fight ended, resetting death counter", Color.Gray);
+                    float hpPercent = (float)Player.statLife / Player.statLifeMax2;
+                    if (hpPercent >= config.HighHealthThreshold)
+                    {
+                        ticksAboveHealthThreshold++;
+                    }
+                    else
+                    {
+                        ticksAboveHealthThreshold = 0;
+                    }
+                }
+                else
+                {
+                    ticksAboveHealthThreshold = 0;
                 }
             }
 
-            // Expected players recompute removed
+            // If stacks exist but no active boss NPCs are present this frame, reset.
+            if (!Main.CurrentFrameFlags.AnyActiveBossNPC)
+            {
+                if (deathsThisBossFight > 0)
+                {
+                    deathsThisBossFight = 0;
+                    if (config?.DebugMode == true)
+                    {
+                        Main.NewText("Boss fight ended, resetting death counter", Color.Gray);
+                    }
+                }
+                ticksAboveHealthThreshold = 0;
+            }
         }
 
         private static bool ShouldProcessSharedState(Player player)

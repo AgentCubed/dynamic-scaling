@@ -220,7 +220,7 @@ namespace DynamicScaling
                 return;
             }
             // Normalize return types. The API returns a Dictionary<string, Dictionary<string, object>> as of newer versions
-            var normalized = BossChecklistUtils.NormalizeBossChecklistReturn(result);
+            var normalized = BossChecklist.NormalizeBossChecklistReturn(result);
             if (normalized == null)
             {
                 caller.Reply("Unexpected BossChecklist return type: " + (result?.GetType().ToString() ?? "null"));
@@ -269,5 +269,5 @@ namespace DynamicScaling
         }
     }
 
-        // Use BossChecklistUtils.NormalizeBossChecklistReturn instead (shared helper)
+        // Use BossChecklist.NormalizeBossChecklistReturn instead (shared helper)
     }

@@ -109,6 +109,7 @@ Configs: {
 			BossGroupSettings: "[i:966] ボスグループ設定"
 			WeaponAdaptation: "[i:3507] 武器適応"
 			BossDynamicDamageScaling: "[i:184] ボスの動的ダメージスケーリング"
+			PlayerHighHealthDamageScaling: "[i:184] プレイヤー高HPによる追加ダメージ"
 			Admin: 管理者設定
 		}
 
@@ -125,6 +126,11 @@ Configs: {
 		HighHealthDamageIncreasePerSecond: {
 			Label: "[i:3507] 高HP時の毎秒追加ダメージ"
 			Tooltip: "遅延が経過した後に、ボスが1秒ごとに追加で与えるダメージ量です。"
+		}
+
+		HighHealthDamageMaximum: {
+			Label: "[i:89] 高HP時の追加ダメージ上限"
+			Tooltip: "高HPスケーリングでプレイヤーに適用される追加ダメージの最大値（上限）です。"
 		}
 	}
 
