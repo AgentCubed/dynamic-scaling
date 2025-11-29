@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DynamicScaling")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aaf7e3063f6bfdc382650b908295e4467d2df078")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74bd2364c41b8322c8d9a62c358123c5bc78fd37")]
 [assembly: System.Reflection.AssemblyProductAttribute("DynamicScaling")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DynamicScaling")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

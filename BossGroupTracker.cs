@@ -65,6 +65,11 @@ namespace DynamicScaling
             ClearAll();
         }
 
+        public override void OnModUnload()
+        {
+            ClearAll();
+        }
+
         private static void ClearAll()
         {
             npcToGroup.Clear();
@@ -73,6 +78,8 @@ namespace DynamicScaling
             nextGroupId = 0;
             bossBarSystem = null;
             clientModifiers.Clear();
+            // Clear client caches in GlobalNPC as well
+            ScalingGlobalNPC.ClearClientCaches();
         }
 
         // Public API for other classes (ScalingBossBar, GlobalNPC) to force a rebuild / clear cache
@@ -203,6 +210,7 @@ namespace DynamicScaling
             if (Main.netMode == NetmodeID.Server)
             {
                 BossSyncPacket.SendBossModifiersForNPC(npc.whoAmI, 1f, 1f);
+                BossSyncPacket.SendScalingDisabledForNPC(npc.whoAmI, groupData[newGroupId].IsScalingDisabled);
             }
 
             return newGroupId;
@@ -454,6 +462,8 @@ namespace DynamicScaling
             {
                 clientAdaptationFactors.Remove(npcWhoAmI);
             }
+            // Remove client-side scaling disabled cache if present
+            try { ScalingGlobalNPC.RemoveClientScalingDisabled(npcWhoAmI); } catch { }
         }
 
         // Get all NPCs in the same group
@@ -521,9 +531,11 @@ namespace DynamicScaling
         private static void UpdatePaceModifiers(NPC npc, BossGroupData groupData, double timeAlive, int currentHpInterval, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
+            if (config == null)
+                return;
 
-            double idealTotalTicks = (config?.ExpectedTotalMinutes ?? DefaultExpectedMinutes) * 3600.0;
-            double deadZoneMinutes = (config?.ExpectedTotalMinutes ?? DefaultExpectedMinutes) / DeadZoneDivisor;
+            double idealTotalTicks = (config.ExpectedTotalMinutes > 0 ? config.ExpectedTotalMinutes : DefaultExpectedMinutes) * 3600.0;
+            double deadZoneMinutes = (config.ExpectedTotalMinutes > 0 ? config.ExpectedTotalMinutes : DefaultExpectedMinutes) / DeadZoneDivisor;
 
             double hpLost = 1.0 - currentHpInterval / (double)FullHealthPercent;
             double idealTime = idealTotalTicks * hpLost;
@@ -653,7 +665,7 @@ namespace DynamicScaling
                 if (ratio >= startMultiplier && !groupData.AdaptationWarned.Contains(key) && !groupData.AdaptationFactors.ContainsKey(key))
                 {
                     groupData.AdaptationWarned.Add(key);
-                    Main.NewText($"{npc.GivenOrTypeName} is beginning to adapt to {GetPlayerName(key.playerId)}'s {GetWeaponNameFromKey(key.weaponKey)}.", Color.Orange);
+                    Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossBeginningAdaptation", npc.GivenOrTypeName, GetPlayerName(key.playerId), GetWeaponNameFromKey(key.weaponKey)), Color.Orange);
                     if (config?.DebugMode == true)
                     {
                         DebugUtil.EmitDebug($"{npc.GivenOrTypeName} is analyzing {GetPlayerName(key.playerId)}'s {GetWeaponNameFromKey(key.weaponKey)} (Ratio: {ratio:F2})", Microsoft.Xna.Framework.Color.Orange);
@@ -696,7 +708,7 @@ namespace DynamicScaling
                 BossSyncPacket.SendAdaptationForNPC(npc.whoAmI, key.playerId, key.weaponKey, factor);
             }
             
-            Main.NewText($"{npc.GivenOrTypeName} has adapted to {GetPlayerName(key.playerId)}'s {GetWeaponNameFromKey(key.weaponKey)}.", Color.Yellow);
+            Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossAdapted", npc.GivenOrTypeName, GetPlayerName(key.playerId), GetWeaponNameFromKey(key.weaponKey)), Color.Yellow);
             var config = ModContent.GetInstance<ServerConfig>();
             if (config?.DebugMode == true)
             {

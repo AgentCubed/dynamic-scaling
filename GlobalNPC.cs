@@ -7,6 +7,8 @@ using Terraria.Localization;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
+using System.IO;
+using Terraria.ModLoader.IO;
 
 namespace DynamicScaling
 {
@@ -97,15 +99,57 @@ namespace DynamicScaling
                 }
                 catch { }
 
+                // Sync scaling disabled value to clients
+                try
+                {
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        BossSyncPacket.SendScalingDisabledForNPC(npc.whoAmI, isScalingDisabled);
+                        BossSyncPacket.SendBossModifiersForNPC(npc.whoAmI, (float)currentDefenseModifier, (float)currentOffenseModifier);
+                    }
+                }
+                catch { }
+
                 // Register for group-based tracking only if this boss has a special boss bar
                 try { BossGroupTracker.RegisterBoss(npc); } catch { }
                 ScalingBossBar.ClearCache();
             }
         }
 
+        // Include scaling disabled state in NPC spawn extra AI so clients receive initial value before damage calculation can occur
+        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter binaryWriter)
+        {
+            try
+            {
+                if (!npc.boss) return;
+                // Only the server writes extra data; clients don't need to send it.
+                if (Main.netMode == NetmodeID.Server)
+                {
+                    binaryWriter.Write(isScalingDisabled);
+                }
+            }
+            catch { }
+        }
+
+        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader binaryReader)
+        {
+            try
+            {
+                if (!npc.boss) return;
+                // When we receive spawn extra AI, the server may have indicated scaling is disabled
+                bool disabled = false;
+                try { disabled = binaryReader.ReadBoolean(); } catch { }
+                SetClientScalingDisabled(npc.whoAmI, disabled);
+                // If instance exists, update instance field as well
+                isScalingDisabled = disabled;
+            }
+            catch { }
+        }
+
         // Client-side cache for network-synced modifiers and adaptation factors.
         private static Dictionary<int, (float defenseModifier, float offenseModifier)> clientModifiers = new Dictionary<int, (float, float)>();
         private static Dictionary<int, Dictionary<(int playerId, int weaponKey), float>> clientAdaptationFactors = new Dictionary<int, Dictionary<(int, int), float>>();
+        private static Dictionary<int, bool> clientScalingDisabled = new Dictionary<int, bool>();
 
         public static bool TryGetClientModifiers(int npcWhoAmI, out float defense, out float offense)
         {
@@ -114,6 +158,22 @@ namespace DynamicScaling
             {
                 defense = tup.defenseModifier;
                 offense = tup.offenseModifier;
+                return true;
+            }
+            return false;
+        }
+
+        public static void SetClientScalingDisabled(int npcWhoAmI, bool disabled)
+        {
+            clientScalingDisabled[npcWhoAmI] = disabled;
+        }
+
+        public static bool TryGetClientScalingDisabled(int npcWhoAmI, out bool disabled)
+        {
+            disabled = false;
+            if (clientScalingDisabled.TryGetValue(npcWhoAmI, out bool val))
+            {
+                disabled = val;
                 return true;
             }
             return false;
@@ -143,6 +203,19 @@ namespace DynamicScaling
                 return true;
             }
             return false;
+        }
+
+        public static void ClearClientCaches()
+        {
+            clientModifiers.Clear();
+            clientAdaptationFactors.Clear();
+            clientScalingDisabled.Clear();
+        }
+
+        public static void RemoveClientScalingDisabled(int npcWhoAmI)
+        {
+            if (clientScalingDisabled.ContainsKey(npcWhoAmI))
+                clientScalingDisabled.Remove(npcWhoAmI);
         }
 
         // Server-side helper called by the BossSyncPacket when clients report damage.
@@ -247,6 +320,12 @@ namespace DynamicScaling
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
             if (!npc.boss || spawnTime < 0)
+            {
+                return;
+            }
+
+            // Prefer client-side cached flag for clients; server uses instance flag assigned on spawn
+            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
             {
                 return;
             }
@@ -370,6 +449,8 @@ namespace DynamicScaling
         private void UpdatePaceModifiers(NPC npc, double timeAlive, int currentHpInterval, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
+            if (config == null)
+                return;
 
             double hpLost = 1.0 - currentHpInterval / (double)FullHealthPercent;
             double idealTime = idealTotalTicks * hpLost;
@@ -506,7 +587,7 @@ namespace DynamicScaling
                 comboAdaptationWarned.Add(comboKey);
                 string playerName = GetPlayerName(comboKey.playerId);
                 string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                Main.NewText($"{npc.GivenOrTypeName} is beginning to adapt to {playerName}'s {weaponName}...", Color.Orange);
+                Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossBeginningAdaptation", npc.GivenOrTypeName, playerName, weaponName), Color.Orange);
             }
 
             if (ratio >= completeMultiplier && phaseTooFast)
@@ -519,7 +600,7 @@ namespace DynamicScaling
                         comboAdaptationFactor[comboKey] = factor;
                         string playerName = GetPlayerName(comboKey.playerId);
                         string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                        Main.NewText($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Color.Yellow);
+                        Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossAdapted", npc.GivenOrTypeName, playerName, weaponName), Color.Yellow);
                     }
                 }
                 else
@@ -527,7 +608,7 @@ namespace DynamicScaling
                     comboAdaptationFactor[comboKey] = factor;
                     string playerName = GetPlayerName(comboKey.playerId);
                     string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                    Main.NewText($"{npc.GivenOrTypeName} has adapted to {playerName}'s {weaponName}.", Color.Yellow);
+                    Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossAdapted", npc.GivenOrTypeName, playerName, weaponName), Color.Yellow);
                 }
             }
             else
@@ -678,6 +759,14 @@ namespace DynamicScaling
                 return;
             }
 
+            // If scaling disabled on the client use cached value for debug display
+            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
+            {
+                if (config?.DebugMode == true)
+                    Main.NewText($"(SYNC) {(int)(hpPercent * FullHealthPercent)}% HP | Scaling disabled via server", Color.Gray);
+                return;
+            }
+
                 if (currentOffenseModifier > 1.0)
                 {
                     // Player is slow: we increase player damage via currentOffenseModifier.
@@ -777,6 +866,17 @@ namespace DynamicScaling
                     comboAdaptationFactor.Clear();
                     comboAdaptationWarned.Clear();
                     lastPhaseTime = spawnTime;
+                    // Apply cached scaling disabled flag if server told us
+                    if (TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled))
+                    {
+                        isScalingDisabled = clientDisabled;
+                    }
+                    // Apply cached defense/offense modifiers if available
+                    if (TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
+                    {
+                        currentDefenseModifier = cdef;
+                        currentOffenseModifier = coff;
+                    }
                 }
 
                 // Clients should not run the following server-only logic.

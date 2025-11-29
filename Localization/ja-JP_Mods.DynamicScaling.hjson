@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: サーバー設定
+
+		DealDamage: {
+			Label: "[i:3507] 与ダメージ"
+			Tooltip: "プレイヤーが敵に与えるダメージを変更します。乗算は 1.2^x（x は値、0 = 変更なし）を使用します。"
+		}
+
+		TakeDamage: {
+			Label: "[i:89] 被ダメージ"
+			Tooltip: "プレイヤーが敵から受けるダメージを変更します。乗算は 1.2^x（x は値、0 = 変更なし）を使用します。"
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 死亡数平準化モード"
+			Tooltip: "ボス戦中、平均死亡数より少ない死を持つプレイヤーに対して受けるダメージを増加させます。全員が死亡している場合、ダメージは時間経過で指数的に増加します。"
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] 想定戦闘時間（分）"
+			Tooltip: "ボス戦の想定時間（分）。ボスはこの時間に合わせるために防御を動的に調整します。0 に設定するとスケーリングを無効化します。"
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] 最大防御補正"
+			Tooltip: "ボスがダメージを減らし戦闘時間を延ばすために、防御を増加できる最大値です。"
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] スケーリング定数"
+			Tooltip: "時間差に基づいてボスの防御がどれだけ速く増加するかを制御します。値が大きいほどスケーリングが攻撃的になります。"
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] この進行値未満で無効化"
+			Tooltip: "BossChecklist の進行値がこの閾値未満のボスには時間スケーリングが適用されません。0 で無効化。/dumpprogression で BossChecklist の値を確認できます。"
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] 最高HPを優先してターゲット"
+			Tooltip: "ボスが最もHPの高いプレイヤーを優先してターゲットするようにします。"
+		}
+
+		DebugMode: {
+			Label: "[i:1299] デバッグモード"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] 最低に近ければターゲットを解除"
+			Tooltip: "ボスが、範囲内で最低HPのプレイヤーとの差が 20 HP 以内のプレイヤーをターゲットするのを防ぎます。"
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] 想定プレイヤー数"
+			Tooltip: "ボス戦の想定プレイヤー数。想定より少ない場合、ボスのダメージと防御が上がります。"
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] この進行値未満で無効化"
+			Tooltip: "想定プレイヤー数のスケーリングは、BossChecklist の進行値がこの閾値未満のボスには適用されません。0 で無効化。"
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] スケーリング乗数"
+			Tooltip: "想定より少ないプレイヤーで戦う場合に、ボスが獲得する追加ダメージおよび防御の量を決める乗数です。"
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] 武器適応を有効"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] 武器適応 開始乗数"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] 武器適応 完了乗数"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] 武器適応 最低ダメージ"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] 武器適応 最大減衰"
+			Tooltip: "武器が平均値に向けてどの程度強く弱体化されるかを制御します。0 = 変更なし、1 = 武器が平均ダメージ値へ弱体化されます。"
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] ソロプレイヤーにも適応"
+			Tooltip: "ボスが単一プレイヤーの武器構成（組み合わせ）に適応できるようにします。"
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] プレイヤー上書き設定"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] ボスタイムスケーリング"
+			BossTargetingSettings: "[i:58] ボスターゲット設定"
+			BossGroupSettings: "[i:966] ボスグループ設定"
+			WeaponAdaptation: "[i:3507] 武器適応"
+			BossDynamicDamageScaling: "[i:184] ボスの動的ダメージスケーリング"
+			Admin: 管理者設定
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] 高HP閾値"
+			Tooltip: "この割合を超えるプレイヤーは高HPと判定されます。ボス近接時に閾値超過時間が記録されます。"
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] 高HP遅延（秒）"
+			Tooltip: "ボスが高HP閾値を超えているプレイヤーにダメージを増やし始めるまでの遅延（秒）です。"
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] 高HP時の毎秒追加ダメージ"
+			Tooltip: "遅延が経過した後に、ボスが1秒ごとに追加で与えるダメージ量です。"
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] 与ダメ修正差"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] 被ダメ修正差"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 死亡数平準化モード"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} は {1} の {2} に適応し始めています..."
+		BossAdapted: "{0} は {1} の {2} に適応しました。"
+		InvalidProgressionValue: "無効な進行値が 0 にリセットされました。"
+	}
+}

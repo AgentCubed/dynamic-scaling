@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: Configuración del servidor
+
+		DealDamage: {
+			Label: "[i:3507] Daño infligido"
+			Tooltip: "Modifica el daño que los jugadores infligen a los enemigos. Usa el multiplicador 1.2^x donde x es el valor (0 = sin cambio)."
+		}
+
+		TakeDamage: {
+			Label: "[i:89] Daño recibido"
+			Tooltip: "Modifica el daño que los jugadores reciben. Usa el multiplicador 1.2^x donde x es el valor (0 = sin cambio)."
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Modo igualar muertes"
+			Tooltip: "Aumenta el daño recibido por los jugadores que tienen menos muertes que la media durante peleas contra jefes. Si todos están muertos, el daño aumenta exponencialmente con el tiempo."
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] Minutos totales esperados"
+			Tooltip: "Tiempo esperado en minutos para una pelea contra un jefe. El jefe ajustará su defensa dinámicamente para intentar que esa duración se cumpla. Establecer a 0 para desactivar la escalación."
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] Modificador máximo de defensa"
+			Tooltip: "Cantidad máxima en la que el jefe puede aumentar su defensa para reducir el daño y alargar la pelea."
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] Constante de escalado"
+			Tooltip: "Controla qué tan rápido aumenta la defensa del jefe en función de la diferencia de ritmo. Valores más altos hacen la escalación más agresiva."
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] Deshabilitar por debajo de este valor de progresión"
+			Tooltip: "La escalación temporal no se aplicará a jefes con un valor de progresión de BossChecklist por debajo de este umbral. 0 para desactivar. Use /dumpprogression para ver los valores de BossChecklist."
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] Apuntar al de mayor vida"
+			Tooltip: "Fuerza a los jefes a priorizar apuntar al jugador con más vida."
+		}
+
+		DebugMode: {
+			Label: "[i:1299] Modo depuración"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] No apuntar si es el más bajo"
+			Tooltip: "Evita que los jefes apunten a jugadores cuyo HP esté dentro de 20 puntos del jugador con la salud más baja en rango."
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] Jugadores esperados"
+			Tooltip: "Número esperado de jugadores para las peleas contra jefes. Si hay menos jugadores presentes, el jefe aumenta su daño y defensa."
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] Deshabilitar por debajo de este valor de progresión"
+			Tooltip: "La escalación por número de jugadores no se aplicará a jefes con un valor de progresión de BossChecklist por debajo de este umbral. 0 para desactivar."
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] Multiplicador de escalado"
+			Tooltip: "Multiplicador de cuánto daño y defensa extra gana el jefe cuando hay menos jugadores de los esperados."
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] Adaptación de armas habilitada"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] Multiplicador inicial (adaptación armas)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] Multiplicador final (adaptación armas)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] Daño mínimo (adaptación armas)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] Reducción máxima (adaptación armas)"
+			Tooltip: "Controla cuán agresivamente las armas se ven reducidas hacia el promedio. 0 = sin cambio, 1 = el arma se reduce al nivel de daño promedio."
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] Adaptar a jugadores en solitario"
+			Tooltip: "Permite que los jefes se adapten a la combinación de armas de un jugador en solitario."
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] Sobrescrituras por jugador"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] Escalado temporal del jefe"
+			BossTargetingSettings: "[i:58] Ajustes de objetivo del jefe"
+			BossGroupSettings: "[i:966] Ajustes de grupo de jefes"
+			WeaponAdaptation: "[i:3507] Adaptación de armas"
+			BossDynamicDamageScaling: "[i:184] Escalado dinámico de daño (jefe)"
+			Admin: Ajustes de administrador
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] Umbral de vida alta"
+			Tooltip: "Los jugadores por encima de este porcentaje se consideran con vida alta. Cuando están cerca de un jefe, se registra el tiempo sobre este umbral."
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] Retardo (s) de vida alta"
+			Tooltip: "Retraso en segundos antes de que el jefe comience a incrementar el daño a jugadores que permanecen por encima del umbral de vida alta."
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] Incremento de daño por segundo (vida alta)"
+			Tooltip: "Cantidad de daño adicional por segundo que el jefe aplica una vez pasado el retardo."
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] Diferencia modificador daño infligido"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] Diferencia modificador daño recibido"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Modo igualar muertes"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} está empezando a adaptarse a {2} de {1}..."
+		BossAdapted: "{0} se ha adaptado a {2} de {1}."
+		InvalidProgressionValue: "Valor(es) de progresión inválido(s) se restablecieron a 0."
+	}
+}

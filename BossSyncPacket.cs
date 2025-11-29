@@ -10,6 +10,7 @@ namespace DynamicScaling
         private const byte PacketTypeSyncBossModifiers = 0;
         private const byte PacketTypeReportComboDamage = 1;
         private const byte PacketTypeSyncAdaptation = 2;
+        private const byte PacketTypeSyncScalingDisabled = 3;
 
         public static void SendBossModifiersForNPC(int npcWhoAmI, float defense, float offense)
         {
@@ -26,6 +27,28 @@ namespace DynamicScaling
             if (config?.DebugMode == true)
             {
                 DebugUtil.EmitDebug($"[BossSyncPacket] SENDING modifier packet: npcIdx={npcWhoAmI}, def={defense:F2}x, off={offense:F2}x", Microsoft.Xna.Framework.Color.Yellow);
+            }
+
+            if (Main.netMode == NetmodeID.Server)
+                packet.Send();
+            else
+                packet.Send(-1, Main.myPlayer);
+        }
+
+        public static void SendScalingDisabledForNPC(int npcWhoAmI, bool disabled)
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                return;
+
+            ModPacket packet = ModContent.GetInstance<DynamicScaling>().GetPacket();
+            packet.Write(PacketTypeSyncScalingDisabled);
+            packet.Write(npcWhoAmI);
+            packet.Write(disabled);
+
+            var config = ModContent.GetInstance<ServerConfig>();
+            if (config?.DebugMode == true)
+            {
+                DebugUtil.EmitDebug($"[BossSyncPacket] SENDING scaling disabled packet: npcIdx={npcWhoAmI}, disabled={disabled}", Microsoft.Xna.Framework.Color.Yellow);
             }
 
             if (Main.netMode == NetmodeID.Server)
@@ -87,6 +110,9 @@ namespace DynamicScaling
                 case PacketTypeSyncAdaptation:
                     ReceiveSyncAdaptation(reader);
                     break;
+                case PacketTypeSyncScalingDisabled:
+                    ReceiveSyncScalingDisabled(reader);
+                    break;
                 default:
                     break;
             }
@@ -111,6 +137,19 @@ namespace DynamicScaling
                 if (config?.DebugMode == true)
                 {
                     DebugUtil.EmitDebug($"[BossSyncPacket] Cache updated: npcIdx={npcIndex}, def={def:F2}x, off={off:F2}x", Microsoft.Xna.Framework.Color.Green);
+                }
+                if (npcIndex >= 0 && npcIndex < Main.maxNPCs)
+                {
+                    NPC npc = Main.npc[npcIndex];
+                    if (npc != null && npc.active)
+                    {
+                        var g = npc.GetGlobalNPC<ScalingGlobalNPC>();
+                        if (g != null)
+                        {
+                            g.currentDefenseModifier = def;
+                            g.currentOffenseModifier = off;
+                        }
+                    }
                 }
             }
         }
@@ -149,6 +188,38 @@ namespace DynamicScaling
                 if (config?.DebugMode == true)
                 {
                     DebugUtil.EmitDebug($"[BossSyncPacket] Client adaptation cache updated: npcIdx={npcIndex}, player={playerId}, weaponKey={weaponKey}, factor={factor:F2}", Microsoft.Xna.Framework.Color.Green);
+                }
+            }
+        }
+
+        private static void ReceiveSyncScalingDisabled(BinaryReader reader)
+        {
+            int npcIndex = reader.ReadInt32();
+            bool disabled = reader.ReadBoolean();
+
+            var config = ModContent.GetInstance<ServerConfig>();
+            if (config?.DebugMode == true)
+            {
+                DebugUtil.EmitDebug($"[BossSyncPacket] RECEIVED scaling disabled packet: npcIdx={npcIndex}, disabled={disabled}", Microsoft.Xna.Framework.Color.Yellow);
+            }
+
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                // Apply to client-side cache and set instance if NPC is active
+                ScalingGlobalNPC.SetClientScalingDisabled(npcIndex, disabled);
+                if (npcIndex >= 0 && npcIndex < Main.maxNPCs)
+                {
+                    NPC npc = Main.npc[npcIndex];
+                    if (npc != null && npc.active)
+                    {
+                        var g = npc.GetGlobalNPC<ScalingGlobalNPC>();
+                        if (g != null)
+                        {
+                            g.isScalingDisabled = disabled;
+                            if (config?.DebugMode == true)
+                                DebugUtil.EmitDebug($"[BossSyncPacket] Set instance isScalingDisabled for npcIdx={npcIndex} to {disabled}", Microsoft.Xna.Framework.Color.Green);
+                        }
+                    }
                 }
             }
         }

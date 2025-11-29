@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: Konfiguracja serwera
+
+		DealDamage: {
+			Label: "[i:3507] Zadawane obrażenia"
+			Tooltip: "Modyfikuje obrażenia zadawane przez gracza wrogom. Używa mnożnika 1.2^x, gdzie x to wartość (0 = brak zmiany)."
+		}
+
+		TakeDamage: {
+			Label: "[i:89] Otrzymywane obrażenia"
+			Tooltip: "Modyfikuje obrażenia otrzymywane przez gracza od wrogów. Używa mnożnika 1.2^x, gdzie x to wartość (0 = brak zmiany)."
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Tryb wyrównywania zgonów"
+			Tooltip: "Zwiększa otrzymywane obrażenia dla graczy, którzy mają mniej zgonów niż średnia podczas walk z bossami. Jeśli wszyscy są martwi, obrażenia rosną wykładniczo w czasie."
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] Oczekiwany czas (min)"
+			Tooltip: "Oczekiwany czas walki z bossem w minutach. Boss dynamicznie dostosuje obronę, aby próbować dopasować ten czas. Ustaw na 0, aby wyłączyć skalowanie."
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] Maksymalny modyfikator obrony"
+			Tooltip: "Maksymalna wartość, o którą boss może zwiększyć swoją obronę, by zmniejszyć obrażenia i wydłużyć walkę."
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] Stała skalowania"
+			Tooltip: "Kontroluje, jak szybko obrona bossa rośnie w zależności od różnicy w tempie walki. Wyższe wartości sprawiają, że skalowanie jest bardziej agresywne."
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] Wyłącz poniżej tego progu postępu"
+			Tooltip: "Skalowanie czasu nie będzie miało zastosowania do bossów o wartości postępu BossChecklist poniżej tego progu. 0 wyłącza. Użyj /dumpprogression, aby zobaczyć wartości z BossChecklist."
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] Cel: najwyższe zdrowie"
+			Tooltip: "Wymusza, aby bossy priorytetowo atakowały gracza z największą ilością punktów życia."
+		}
+
+		DebugMode: {
+			Label: "[i:1299] Tryb debugowania"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] Przestań celować, jeśli najniższe"
+			Tooltip: "Uniemożliwia bossom celowanie w graczy, których aktualne życie jest w granicy 20 HP od gracza o najniższym zdrowiu w zasięgu."
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] Oczekiwana liczba graczy"
+			Tooltip: "Oczekiwana liczba graczy dla walk z bossami. Jeśli obecnych jest mniej graczy, boss zwiększa swoje obrażenia i obronę."
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] Wyłącz poniżej tego progu postępu"
+			Tooltip: "Skalowanie według oczekiwanej liczby graczy nie będzie stosowane do bossów o wartości postępu BossChecklist poniżej tego progu. 0 wyłącza."
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] Mnożnik skalowania"
+			Tooltip: "Mnożnik określający, ile dodatkowych obrażeń i obrony zyskuje boss, gdy walczy mniej graczy niż oczekiwano."
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] Adaptacja broni włączona"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] Początkowy mnożnik adaptacji broni"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] Końcowy mnożnik adaptacji broni"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] Minimalne obrażenia (adaptacja broni)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] Maksymalna redukcja (adaptacja broni)"
+			Tooltip: "Kontroluje, jak agresywnie broń jest osłabiana w kierunku średniej. 0 = brak zmiany, 1 = broń jest osłabiona do średniego poziomu obrażeń."
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] Dostosuj do graczy solo"
+			Tooltip: "Pozwala bossom dostosować się do kombinacji broni pojedynczego gracza."
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] Nadpisania gracza"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] Skalowanie czasu bossa"
+			BossTargetingSettings: "[i:58] Ustawienia celowania bossa"
+			BossGroupSettings: "[i:966] Ustawienia grupy bossów"
+			WeaponAdaptation: "[i:3507] Adaptacja broni"
+			BossDynamicDamageScaling: "[i:184] Dynamiczne skalowanie obrażeń (boss)"
+			Admin: Ustawienia administratora
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] Próg wysokiego zdrowia"
+			Tooltip: "Gracze powyżej tego procentu są uważani za mających wysokie zdrowie. Będąc blisko bossa, śledzony jest czas spędzony powyżej tego progu."
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] Opóźnienie przy wysokim zdrowiu (s)"
+			Tooltip: "Opóźnienie w sekundach, zanim boss zacznie zwiększać obrażenia dla graczy pozostających powyżej progu wysokiego zdrowia."
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] Przyrost obrażeń na sekundę przy wysokim zdrowiu"
+			Tooltip: "Ilość dodatkowych obrażeń na sekundę, które boss zadaje po zakończeniu opóźnienia."
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] Różnica modyfikatora zadawanych obrażeń"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] Różnica modyfikatora otrzymywanych obrażeń"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Tryb wyrównywania zgonów"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0}이(가) {1}의 {2}에 적응을 시작합니다..."
+		BossAdapted: "{0}이(가) {1}의 {2}에 적응했습니다."
+		InvalidProgressionValue: "Nieprawidłowe wartości postępu zostały zresetowane do 0."
+	}
+}

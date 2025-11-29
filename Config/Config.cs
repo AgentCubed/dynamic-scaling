@@ -52,9 +52,9 @@ namespace DynamicScaling
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ScalingConstant.Tooltip")]
         public float ScalingConstant { get; set; } = 2f;
 
-        [DefaultValue("0")]
+        [DefaultValue("2")]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.BossProgressionThreshold.Tooltip")]
-        public string BossProgressionThreshold { get; set; } = "0";
+        public string BossProgressionThreshold { get; set; } = "2";
 
         [Header("BossTargetingSettings")]
         [DefaultValue(false)]
@@ -66,15 +66,15 @@ namespace DynamicScaling
         public bool StopTargetingIfLowest { get; set; } = true;
 
         [Header("BossGroupSettings")]
-        [DefaultValue(1)]
+        [DefaultValue(0)]
         [Range(1, 255)]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ExpectedPlayers.Tooltip")]
-        public int ExpectedPlayers { get; set; } = 1;
+        public int ExpectedPlayers { get; set; } = 0;
 
-        [DefaultValue(0.3f)]
+        [DefaultValue(0.12f)]
         [Range(0f, 10f)]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ScalingMultiplier.Tooltip")]
-        public float ScalingMultiplier { get; set; } = 0.3f;
+        public float ScalingMultiplier { get; set; } = 0.12f;
 
         [DefaultValue("0")]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.ExpectedPlayersBossProgressionThreshold.Tooltip")]
@@ -115,7 +115,7 @@ namespace DynamicScaling
             }
             if (changed)
             {
-                string reason = "Invalid progression value(s) were reset to 0.";
+                string reason = Language.GetTextValue("Mods.DynamicScaling.Messages.InvalidProgressionValue");
                 message = NetworkText.FromLiteral(reason);
                 if (Main.netMode == NetmodeID.Server || Main.netMode == NetmodeID.SinglePlayer)
                 {
@@ -142,7 +142,7 @@ namespace DynamicScaling
             {
                 // Persist corrected values and notify players
                 SaveChanges(this, (s, c) => { }, silent: true, broadcast: true);
-                string reason = "Invalid progression value(s) were reset to 0.";
+                string reason = Language.GetTextValue("Mods.DynamicScaling.Messages.InvalidProgressionValue");
                 if (Main.netMode == NetmodeID.Server || Main.netMode == NetmodeID.SinglePlayer)
                 {
                     Main.NewText(reason, Color.Yellow);
@@ -171,17 +171,17 @@ namespace DynamicScaling
         [Range(1f, 10f)]
         public float WeaponAdaptationStartMultiplier { get; set; } = 2f;
 
-        [DefaultValue(4f)]
+        [DefaultValue(6f)]
         [Range(1f, 20f)]
-        public float WeaponAdaptationCompleteMultiplier { get; set; } = 4f;
+        public float WeaponAdaptationCompleteMultiplier { get; set; } = 6f;
 
         [DefaultValue(200f)]
         [Range(0f, 10000f)]
         public float WeaponAdaptationMinDamage { get; set; } = 200f;
 
-        [DefaultValue(0.2f)]
+        [DefaultValue(0.1f)]
         [Range(0f, 1f)]
-        public float WeaponAdaptationMaxReduction { get; set; } = 0.2f;
+        public float WeaponAdaptationMaxReduction { get; set; } = 0.1f;
 
         [DefaultValue(false)]
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.WeaponAdaptationAdaptToSoloPlayers.Tooltip")]

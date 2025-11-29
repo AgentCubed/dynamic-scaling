@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: 서버 설정
+
+		DealDamage: {
+			Label: "[i:3507] 가하는 피해"
+			Tooltip: "플레이어가 적에게 가하는 피해를 수정합니다. 승수는 1.2^x를 사용하며 x는 값입니다 (0 = 변경 없음)."
+		}
+
+		TakeDamage: {
+			Label: "[i:89] 받는 피해"
+			Tooltip: "플레이어가 적에게서 받는 피해를 수정합니다. 승수는 1.2^x를 사용하며 x는 값입니다 (0 = 변경 없음)."
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 죽음 균등화 모드"
+			Tooltip: "보스 전투 중 평균 사망 수보다 적은 사망을 가진 플레이어가 받는 피해를 증가시킵니다. 모두가 죽었을 경우 피해는 시간이 지남에 따라 기하급수적으로 증가합니다."
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] 예상 총 분"
+			Tooltip: "보스 전투의 예상 시간(분). 보스는 이 시간을 맞추기 위해 방어력을 동적으로 조정합니다. 0으로 설정하면 스케일링을 비활성화합니다."
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] 최대 방어 보정"
+			Tooltip: "보스가 피해를 줄이고 전투를 연장하기 위해 방어력을 증가시킬 수 있는 최대치입니다."
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] 스케일링 상수"
+			Tooltip: "페이싱 차이에 따라 보스 방어력이 얼마나 빠르게 증가하는지를 제어합니다. 값이 클수록 스케일링이 더 공격적입니다."
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] 이 진행 값 미만이면 비활성화"
+			Tooltip: "BossChecklist 진행 값이 이 임계값보다 낮은 보스에는 시간 기반 스케일링이 적용되지 않습니다. 0은 비활성화를 의미합니다. BossChecklist 값을 보려면 /dumpprogression을 사용하세요."
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] 최대 체력 우선 타겟팅"
+			Tooltip: "보스가 현재 체력이 가장 높은 플레이어를 우선적으로 타겟하도록 합니다."
+		}
+
+		DebugMode: {
+			Label: "[i:1299] 디버그 모드"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] 최저에 가까우면 타겟 해제"
+			Tooltip: "범위 내에서 최저 체력 플레이어와 체력 차이가 20 HP 이내인 플레이어를 보스가 타겟하지 않도록 합니다."
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] 예상 플레이어 수"
+			Tooltip: "보스 전투에 예상되는 플레이어 수. 실제로 플레이어 수가 적으면 보스의 피해와 방어가 증가합니다."
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] 이 진행 값 미만이면 비활성화"
+			Tooltip: "예상 플레이어 수에 따른 스케일링은 BossChecklist 진행 값이 이 임계값보다 낮은 보스에는 적용되지 않습니다. 0은 비활성화입니다."
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] 스케일링 배수"
+			Tooltip: "예상보다 적은 플레이어가 전투에 참여할 때 보스가 얻는 추가 피해 및 방어량의 배수입니다."
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] 무기 적응 활성화"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] 무기 적응 시작 배수"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] 무기 적응 완료 배수"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] 무기 적응 최소 피해"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] 무기 적응 최대 감소"
+			Tooltip: "무기를 평균으로 맞추는 정도를 제어합니다. 0 = 변경 없음, 1 = 무기가 평균 피해 수준으로 조정됩니다."
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] 솔로 플레이어에 적응"
+			Tooltip: "보스가 단일 플레이어의 무기 조합에 적응하도록 허용합니다."
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] 플레이어별 재정의"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] 보스 시간 스케일링"
+			BossTargetingSettings: "[i:58] 보스 타게팅 설정"
+			BossGroupSettings: "[i:966] 보스 그룹 설정"
+			WeaponAdaptation: "[i:3507] 무기 적응"
+			BossDynamicDamageScaling: "[i:184] 보스 동적 데미지 스케일링"
+			Admin: 관리자 설정
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] 높은 체력 임계값"
+			Tooltip: "이 퍼센트 이상인 플레이어는 높은 체력으로 간주됩니다. 보스 근처에 있을 때 이 임계값을 초과한 시간을 추적합니다."
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] 높은 체력 지연(초)"
+			Tooltip: "보스가 높은 체력 임계값을 유지하는 플레이어에게 피해를 증가시키기 시작하기 전의 지연(초)입니다."
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] 높은 체력 시 초당 피해 증가량"
+			Tooltip: "지연이 끝난 후 보스가 초당 적용하는 추가 피해량입니다."
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] 가하는 피해 보정 차이"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] 받는 피해 보정 차이"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 죽음 균등화 모드"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0}이(가) {1}의 {2}에 적응을 시작합니다..."
+		BossAdapted: "{0}이(가) {1}의 {2}에 적응했습니다."
+		InvalidProgressionValue: "잘못된 진행값이 0으로 재설정되었습니다."
+	}
+}

@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: 伺服器設定
+
+		DealDamage: {
+			Label: "[i:3507] 對敵造成的傷害"
+			Tooltip: "修改玩家對敵人造成的傷害。使用乘數 1.2^x（x 為該值，0 = 無變化）。"
+		}
+
+		TakeDamage: {
+			Label: "[i:89] 受到的傷害"
+			Tooltip: "修改玩家受到的傷害。使用乘數 1.2^x（x 為該值，0 = 無變化）。"
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 死亡平均化模式"
+			Tooltip: "在首領戰中，對於死亡次數低於平均值的玩家提高其所受傷害。如果全員陣亡，傷害會隨時間呈指數增加。"
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] 預期總時長（分鐘）"
+			Tooltip: "首領戰預期的時間（分鐘）。首領會動態地調整防禦以嘗試匹配此時長。設為 0 可停用縮放。"
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] 最大防禦修正值"
+			Tooltip: "首領可以增加防禦以降低傷害並延長戰鬥的最大值。"
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] 縮放常數"
+			Tooltip: "控制首領防禦根據節奏差異增加的速度。數值越高，縮放越激進。"
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] 低於此進度值時停用"
+			Tooltip: "如果 BossChecklist 的進度值低於此門檻，則不對該首領應用時間縮放。0 表示停用。使用 /dumpprogression 查看 BossChecklist 的進度值。"
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] 優先目標：最高生命值"
+			Tooltip: "強制首領優先鎖定當前生命值最高的玩家。"
+		}
+
+		DebugMode: {
+			Label: "[i:1299] 除錯模式"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] 若接近最低則停止目標鎖定"
+			Tooltip: "阻止首領鎖定那些其生命值與範圍內最低生命玩家差距在 20 HP 以內的玩家。"
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] 預期玩家數"
+			Tooltip: "首領戰預期的玩家數量。如果實際玩家數較少，首領的傷害與防禦會增加。"
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] 低於此進度值時停用"
+			Tooltip: "若 BossChecklist 的進度值低於此門檻，則不套用預期玩家數的縮放。0 表示停用。"
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] 縮放乘數"
+			Tooltip: "當參戰玩家少於預期時，用於計算首領額外傷害與防禦的乘數。"
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] 啟用武器自適應"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] 武器自適應 起始乘數"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] 武器自適應 完成乘數"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] 武器自適應 最低傷害"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] 武器自適應 最大減幅"
+			Tooltip: "控制武器向平均值被削弱的程度。0 = 無變化，1 = 武器被削弱到平均傷害水平。"
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] 適配單人玩家"
+			Tooltip: "允許首領針對單一玩家的武器組合進行適配。"
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] 玩家覆蓋設定"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] 首領時間縮放"
+			BossTargetingSettings: "[i:58] 首領目標設定"
+			BossGroupSettings: "[i:966] 首領群組設定"
+			WeaponAdaptation: "[i:3507] 武器自適應"
+			BossDynamicDamageScaling: "[i:184] 首領動態傷害縮放"
+			Admin: 管理者設定
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] 高生命閾值"
+			Tooltip: "超過此百分比的玩家被視為生命值較高。靠近首領時會追蹤超過此閾值的時間。"
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] 高生命延遲（秒）"
+			Tooltip: "在首領開始對仍維持高生命閾值以上的玩家增加傷害之前的延遲（秒）。"
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] 高生命每秒額外傷害"
+			Tooltip: "延遲結束後，首領每秒新增施加的傷害量。"
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] 造成傷害修正差異"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] 受到傷害修正差異"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] 死亡均衡模式"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} 正在開始對 {1} 的 {2} 進行適應..."
+		BossAdapted: "{0} 已經對 {1} 的 {2} 進行適應。"
+		InvalidProgressionValue: "無效的進度值已被重設為 0。"
+	}
+}

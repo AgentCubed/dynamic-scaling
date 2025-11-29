@@ -33,7 +33,7 @@ Configs: {
 		}
 
 		BossProgressionThreshold: {
-			Label: "[i:43] Boss Progression Threshold"
+			Label: "[i:43] Disable Below This Progression Value"
 			Tooltip: Time-scaling won't apply to bosses with a BossChecklist progression value below this threshold. 0 to disable. Use /dumpprogression to view progression values from BossChecklist.
 		}
 
@@ -58,7 +58,7 @@ Configs: {
 		}
 
 		ExpectedPlayersBossProgressionThreshold: {
-			Label: "[i:43] Expected Players Boss Progression Threshold"
+			Label: "[i:43] Disable Below This Progression Value"
 			Tooltip: Expected players scaling won't apply to bosses with a BossChecklist progression value below this threshold. 0 to disable. Use /dumpprogression to view progression values from BossChecklist.
 		}
 
@@ -109,6 +109,7 @@ Configs: {
 			BossGroupSettings: "[i:966] Boss Group Settings"
 			WeaponAdaptation: "[i:3507] Weapon Adaptation"
 			BossDynamicDamageScaling: "[i:184] Boss Dynamic Damage Scaling"
+			Admin: Admin Settings
 		}
 
 		HighHealthThreshold: {
@@ -144,5 +145,11 @@ Configs: {
 			Label: "[i:321] Equalize Deaths Mode"
 			Tooltip: ""
 		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} is beginning to adapt to {1}'s {2}...",
+		BossAdapted: "{0} has adapted to {1}'s {2}.",
+		InvalidProgressionValue: "Invalid progression value(s) were reset to 0."
 	}
 }

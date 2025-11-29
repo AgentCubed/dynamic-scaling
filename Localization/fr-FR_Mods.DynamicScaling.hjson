@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: Configuration du serveur
+
+		DealDamage: {
+			Label: "[i:3507] Dégâts infligés"
+			Tooltip: "Modifie les dégâts infligés aux ennemis par le joueur. Utilise le multiplicateur 1.2^x où x est la valeur (0 = aucun changement)."
+		}
+
+		TakeDamage: {
+			Label: "[i:89] Dégâts subis"
+			Tooltip: "Modifie les dégâts subis par le joueur. Utilise le multiplicateur 1.2^x où x est la valeur (0 = aucun changement)."
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Mode égalisation des morts"
+			Tooltip: "Augmente les dégâts subis par les joueurs ayant moins de morts que la moyenne durant les combats de boss. Si tous sont morts, les dégâts augmentent exponentiellement avec le temps."
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] Durée totale prévue (min)"
+			Tooltip: "Durée attendue en minutes d'un combat de boss. Le boss ajustera dynamiquement sa défense pour tenter d'atteindre cette durée. Mettre à 0 pour désactiver la mise à l'échelle."
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] Modificateur maximal de défense"
+			Tooltip: "Montant maximal que le boss peut ajouter à sa défense pour réduire les dégâts et rallonger le combat."
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] Constante de scalabilité"
+			Tooltip: "Contrôle la vitesse à laquelle la défense du boss augmente en fonction de l'écart de rythme. Des valeurs plus élevées rendent la scalabilité plus agressive."
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] Désactiver en dessous de cette progression"
+			Tooltip: "La mise à l'échelle temporelle ne s'appliquera pas aux boss ayant une valeur de progression BossChecklist inférieure à ce seuil. 0 pour désactiver. Utilisez /dumpprogression pour voir les valeurs BossChecklist."
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] Cibler la vie la plus élevée"
+			Tooltip: "Force les boss à prioriser l'attaque du joueur ayant le plus de points de vie."
+		}
+
+		DebugMode: {
+			Label: "[i:1299] Mode debug"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] Ne pas cibler si le plus faible"
+			Tooltip: "Empêche les boss de cibler des joueurs dont la vie est dans un intervalle de 20 PV autour du joueur ayant la plus faible vie à portée."
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] Joueurs attendus"
+			Tooltip: "Nombre attendu de joueurs pour les combats de boss. Si moins de joueurs sont présents, le boss augmente ses dégâts et sa défense."
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] Désactiver en dessous de cette progression"
+			Tooltip: "La mise à l'échelle liée au nombre de joueurs ne s'appliquera pas aux boss ayant une valeur de progression BossChecklist inférieure à ce seuil. 0 pour désactiver."
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] Multiplicateur de scalabilité"
+			Tooltip: "Multiplicateur déterminant combien de dégâts et de défense supplémentaires le boss gagne lorsqu'il y a moins de joueurs que prévu."
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] Adaptation d'arme activée"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] Multiplicateur de départ (adaptation arme)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] Multiplicateur complet (adaptation arme)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] Dégâts min (adaptation arme)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] Réduction maximale (adaptation arme)"
+			Tooltip: "Contrôle l'agressivité avec laquelle les armes sont réduites vers la moyenne. 0 = aucun changement, 1 = l'arme est réduite au niveau de dégâts moyen."
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] S'adapter aux joueurs solo"
+			Tooltip: "Permet aux boss de s'adapter à la combinaison d'armes d'un joueur solo."
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] Remplacements joueur"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] Ajustement temporel du boss"
+			BossTargetingSettings: "[i:58] Paramètres de ciblage du boss"
+			BossGroupSettings: "[i:966] Paramètres de groupe de boss"
+			WeaponAdaptation: "[i:3507] Adaptation d'arme"
+			BossDynamicDamageScaling: "[i:184] Scalabilité dynamique des dégâts (boss)"
+			Admin: Paramètres administrateur
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] Seuil haute vie"
+			Tooltip: "Les joueurs au-dessus de ce pourcentage sont considérés en vie élevée. Quand près d'un boss, le temps au-dessus de ce seuil est suivi."
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] Délai haute vie (s)"
+			Tooltip: "Délai en secondes avant que le boss commence à augmenter les dégâts sur les joueurs restant au-dessus du seuil de haute vie."
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] Augmentation dégâts par seconde (haute vie)"
+			Tooltip: "Montant de dégâts additionnels par seconde que le boss applique une fois le délai écoulé."
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] Différence modif. dégâts infligés"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] Différence modif. dégâts subis"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Mode égalisation des morts"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} commence à s'adapter à {2} de {1}..."
+		BossAdapted: "{0} s'est adapté à {2} de {1}."
+		InvalidProgressionValue: "Valeur(s) de progression non valides remises à 0."
+	}
+}

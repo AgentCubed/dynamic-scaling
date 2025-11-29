@@ -1,0 +1,155 @@
+Configs: {
+	ServerConfig: {
+		DisplayName: Configurazione Server
+
+		DealDamage: {
+			Label: "[i:3507] Danno inflitto"
+			Tooltip: "Modifica il danno inflitto ai nemici dal giocatore. Usa il moltiplicatore 1.2^x dove x è il valore (0 = nessuna modifica)."
+		}
+
+		TakeDamage: {
+			Label: "[i:89] Danno subito"
+			Tooltip: "Modifica il danno subito dal giocatore. Usa il moltiplicatore 1.2^x dove x è il valore (0 = nessuna modifica)."
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Modalità equilibrio morti"
+			Tooltip: "Aumenta il danno subito dai giocatori che hanno meno morti della media durante i combattimenti contro i boss. Se tutti sono morti, il danno aumenta esponenzialmente nel tempo."
+		}
+
+		ExpectedTotalMinutes: {
+			Label: "[i:15] Minuti totali attesi"
+			Tooltip: "Tempo previsto in minuti per un combattimento con il boss. Il boss adatterà dinamicamente la difesa per cercare di corrispondere a questa durata. Impostare a 0 per disabilitare la scalatura."
+		}
+
+		MaxDefenseModifier: {
+			Label: "[i:156] Massima modifica difesa"
+			Tooltip: "Quantità massima con cui il boss può aumentare la sua difesa per ridurre il danno e prolungare il combattimento."
+		}
+
+		ScalingConstant: {
+			Label: "[i:149] Costante di scalatura"
+			Tooltip: "Controlla la velocità con cui la difesa del boss aumenta in base alla differenza di ritmo. Valori più alti rendono la scalatura più aggressiva."
+		}
+
+		BossProgressionThreshold: {
+			Label: "[i:43] Disattiva sotto questo valore di progressione"
+			Tooltip: "La scalatura temporale non si applicherà ai boss con un valore di progressione di BossChecklist inferiore a questa soglia. 0 per disabilitare. Usa /dumpprogression per vedere i valori di BossChecklist."
+		}
+
+		TargetHighestHealth: {
+			Label: "[i:58] Puntare il più sano"
+			Tooltip: "Forza i boss a dare priorità nell'attaccare il giocatore con più punti vita."
+		}
+
+		DebugMode: {
+			Label: "[i:1299] Modalità debug"
+			Tooltip: ""
+		}
+
+		StopTargetingIfLowest: {
+			Label: "[i:3202] Non mirare se è il più debole"
+			Tooltip: "Impedisce ai boss di mirare a giocatori che si trovano entro 20 PV del giocatore con meno salute nell'area."
+		}
+
+		ExpectedPlayers: {
+			Label: "[i:966] Giocatori attesi"
+			Tooltip: "Numero previsto di giocatori per i combattimenti con i boss. Se ci sono meno giocatori, il boss aumenta danno e difesa."
+		}
+
+		ExpectedPlayersBossProgressionThreshold: {
+			Label: "[i:43] Disattiva sotto questo valore di progressione"
+			Tooltip: "La scalatura legata al numero di giocatori non si applica ai boss con un valore di progressione di BossChecklist sotto questa soglia. 0 per disabilitare."
+		}
+
+		ScalingMultiplier: {
+			Label: "[i:184] Moltiplicatore di scalatura"
+			Tooltip: "Moltiplicatore per quanto danno e difesa extra il boss ottiene quando ci sono meno giocatori del previsto."
+		}
+
+		WeaponAdaptationEnabled: {
+			Label: "[i:3507] Adattamento armi abilitato"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationStartMultiplier: {
+			Label: "[i:3507] Moltiplicatore iniziale (adattamento armi)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationCompleteMultiplier: {
+			Label: "[i:3507] Moltiplicatore completo (adattamento armi)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMinDamage: {
+			Label: "[i:3507] Danno minimo (adattamento armi)"
+			Tooltip: ""
+		}
+
+		WeaponAdaptationMaxReduction: {
+			Label: "[i:3507] Riduzione massima (adattamento armi)"
+			Tooltip: "Controlla quanto aggressivamente le armi vengono nerfate verso la media. 0 = nessuna modifica, 1 = l'arma è nerfata al livello di danno medio."
+		}
+
+		WeaponAdaptationAdaptToSoloPlayers: {
+			Label: "[i:3507] Adatta ai giocatori singoli"
+			Tooltip: "Permette ai boss di adattarsi alla combinazione di armi di un singolo giocatore."
+		}
+
+		PlayerOverrides: {
+			Label: "[i:58] Sostituzioni giocatore"
+			Tooltip: ""
+		}
+
+		Headers: {
+			DamageEditor: "[i:3507] Damage Editor"
+			BossTimeScaling: "[i:15] Scalatura temporale boss"
+			BossTargetingSettings: "[i:58] Impostazioni targeting boss"
+			BossGroupSettings: "[i:966] Impostazioni gruppo boss"
+			WeaponAdaptation: "[i:3507] Adattamento armi"
+			BossDynamicDamageScaling: "[i:184] Scalatura dinamica danno (boss)"
+			Admin: Impostazioni amministratore
+		}
+
+		HighHealthThreshold: {
+			Label: "[i:58] Soglia alta salute"
+			Tooltip: "I giocatori sopra questa percentuale sono considerati ad alta salute. Quando vicini a un boss, viene tracciato il tempo trascorso sopra questa soglia."
+		}
+
+		HighHealthDelaySeconds: {
+			Label: "[i:15] Ritardo alta salute (sec)"
+			Tooltip: "Il ritardo in secondi prima che il boss inizi ad aumentare il danno sui giocatori che rimangono sopra la soglia di alta salute."
+		}
+
+		HighHealthDamageIncreasePerSecond: {
+			Label: "[i:3507] Aumento danno/s in alta salute"
+			Tooltip: "La quantità di danno aggiuntivo per secondo che il boss applica una volta che il ritardo è trascorso."
+		}
+	}
+
+	PlayerTuning: {
+		Tooltip: ""
+
+		DealDamageModifierDifference: {
+			Label: "[i:3507] Differenza modificatore danno inflitto"
+			Tooltip: ""
+		}
+
+		TakeDamageModifierDifference: {
+			Label: "[i:89] Differenza modificatore danno subito"
+			Tooltip: ""
+		}
+
+		EqualizeDeathsMode: {
+			Label: "[i:321] Modalità equilibrio morti"
+			Tooltip: ""
+		}
+	}
+
+	Messages: {
+		BossBeginningAdaptation: "{0} sta iniziando ad adattarsi a {2} di {1}..."
+		BossAdapted: "{0} si è adattato a {2} di {1}."
+		InvalidProgressionValue: "Valori di progressione non validi sono stati reimpostati a 0."
+	}
+}
