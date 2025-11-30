@@ -10,125 +10,82 @@ The player scaling model adjusts the damage players deal and take based on confi
 
 The damage a player deals to NPCs is modified by a multiplier derived from a base configuration and player-specific overrides.
 
-$$
-M_{deal} = 1.2^{(C_{deal} + \delta_{deal})}
-$$
+*   **Concept:** Players deal less damage as they accumulate deaths during a boss fight.
+*   **Formula:**
+    $$M_{deal}^{(p)} = 1.2^{(C_{deal} - N_{deaths}^{(p)} + \delta_{deal}^{(p)})}$$
+    $$D_{final}^{(p)} = D_{initial} \times M_{deal}^{(p)}$$
 
-$$
-D_{final} = D_{initial} \times M_{deal}
-$$
-
-Where:
-
--   $C_{deal}$ is the global `DealDamage` configuration value.
--   $\delta_{deal}$ is the player-specific `DealDamageModifierDifference` from `PlayerOverrides`.
+    Where:
+    *   $C_{deal}$: Global `DealDamage` configuration value.
+    *   $N_{deaths}^{(p)}$: Number of deaths for player $p$ during the current boss fight.
+    *   $\delta_{deal}^{(p)}$: Player-specific `DealDamageModifierDifference` from `PlayerOverrides`.
 
 ### 1.2 Damage Intake Scaling ($D_{in}$)
 
 The damage a player takes from NPCs is similarly modified, but deaths have a double weight to punish repeated failure more severely.
 
-$$
-M_{take} = 1.2^{(C_{take} + 2 \cdot N_{deaths} + \delta_{take})}
-$$
+*   **Concept:** Players take more damage as they accumulate deaths.
+*   **Formula:**
+    $$M_{take}^{(p)} = 1.2^{(C_{take} + 2 \cdot N_{deaths}^{(p)} + \delta_{take}^{(p)})}$$
+    $$D_{taken}^{(p)} = D_{raw} \times M_{take}^{(p)}$$
 
-$$
-D_{taken} = D_{raw} \times M_{take}
-$$
-
-Where:
-
--   $C_{take}$ is the global `TakeDamage` configuration value.
--   $\delta_{take}$ is the player-specific `TakeDamageModifierDifference`.
+    Where:
+    *   $C_{take}$: Global `TakeDamage` configuration value.
+    *   $\delta_{take}^{(p)}$: Player-specific `TakeDamageModifierDifference`.
 
 ### 1.3 Expected Players Scaling ($S_{exp}$)
 
 If the number of players nearby a boss is less than the configured `ExpectedPlayers`, incoming damage is increased to compensate for the lack of players (simulating the difficulty of a full party).
 
-If $N_{nearby} < N_{expected}$:
+*   **Condition:** $N_{nearby} < N_{expected}$
+*   **Scaling Factor:**
+    $$\Delta N = N_{expected} - N_{nearby}$$
+    $$M_{exp} = K_{scale} \cdot (\Delta N)^2 + 1$$
+    $$D_{taken} \leftarrow D_{taken} \times M_{exp}$$
 
-$$
-\Delta N = N_{expected} - N_{nearby}
-$$
-
-$$
-M_{exp} = K_{scale} \cdot (\Delta N)^2 + 1
-$$
-
-$$
-D_{taken} \leftarrow D_{taken} \times M_{exp}
-$$
-
-Where:
-
--   $N_{nearby}$ is the count of active players within 300 tiles of the boss.
--   $N_{expected}$ is the `ExpectedPlayers` config value.
--   $K_{scale}$ is the `ScalingMultiplier` config value.
+    Where:
+    *   $N_{nearby}$: Count of active players within 300 tiles of the boss.
+    *   $N_{expected}$: `ExpectedPlayers` config value.
+    *   $K_{scale}$: `ScalingMultiplier` config value.
 
 ### 1.4 Equalize Deaths Mode ($M_{eq}$)
 
-When `EqualizeDeathsMode` is enabled, an additional multiplier is applied to incoming damage to synchronize the difficulty across the party, punishing players who are performing better than average (fewer deaths) or when the party is struggling (many dead).
+When `EqualizeDeathsMode` is enabled, an additional multiplier is applied to incoming damage to synchronize the difficulty across the party.
 
-$$
-M_{eq} = F_{alive} \times F_{diff} \times F_{time}
-$$
+*   **Concept:** Punishes players performing better than average (fewer deaths) or when the party is struggling (many dead).
+*   **Formula:**
+    $$M_{eq} = F_{alive} \times F_{diff} \times F_{time}$$
 
 #### 1.4.1 Alive Factor ($F_{alive}$)
-
 Increases damage when fewer players are alive.
-
-$$
-F_{alive} = 1 + 0.5 \cdot \left( \frac{N_{online} - N_{alive}}{N_{online}} \right)
-$$
+$$F_{alive} = 1 + 0.5 \cdot \left( \frac{N_{online} - N_{alive}}{N_{online}} \right)$$
 
 #### 1.4.2 Individual Difference Factor ($F_{diff}$)
-
 Increases damage for players who have fewer deaths than the party average.
-
-$$
-\mu_{deaths} = \frac{N_{total\_deaths}}{N_{online}}
-$$
-
-$$
-F_{diff} = \max\left(1, 1 + 0.15 \cdot (\mu_{deaths} - N_{your\_deaths}) \right)
-$$
+$$\mu_{deaths} = \frac{N_{total\_deaths}}{N_{online}}$$
+$$F_{diff} = \max\left(1, 1 + 0.15 \cdot (\mu_{deaths} - N_{your\_deaths}) \right)$$
 
 #### 1.4.3 Time Factor ($F_{time}$)
-
 Increases damage over time to prevent stalling.
-
-$$
-F_{time} = 1 + 0.0003 \cdot T_{seconds}^2
-$$
+$$F_{time} = 1 + 0.0003 \cdot T_{seconds}^2$$
 
 ### 1.5 High Health Damage Scaling ($S_{high}$)
 
-When enabled, players take additional flat damage during boss fights if they remain above a health threshold for an extended period. This encourages active engagement and prevents players from staying at full health indefinitely.
+When enabled, players take additional flat damage during boss fights if they remain above a health threshold for an extended period.
 
-After a configurable delay, players begin taking increasing flat damage per second, up to a maximum cap.
+*   **Concept:** Encourages active engagement and prevents players from staying at full health indefinitely.
+*   **Formula:**
+    $$T_{over} = \max(0, T_{above} - T_{delay})$$
+    $$D_{extra} = \min(C_{max}, C_{rate} \cdot T_{over})$$
+    $$D_{taken} \leftarrow D_{taken} + D_{extra}$$
 
-$$
-T_{over} = \max(0, T_{above} - T_{delay})
-$$
-
-$$
-D_{extra} = \min(C_{max}, C_{rate} \cdot T_{over})
-$$
-
-$$
-D_{taken} \leftarrow D_{taken} + D_{extra}
-$$
-
-Where:
-
--   $T_{above}$ is the time in seconds the player has been above the health threshold.
--   $T_{delay}$ is `HighHealthDelaySeconds` (default: 10 seconds).
--   $C_{rate}$ is `HighHealthDamageIncreasePerSecond` (default: 1 damage/second).
--   $C_{max}$ is `HighHealthDamageMaximum` (default: 100 damage).
--   Only applies during active boss fights when players are within range of bosses.
+    Where:
+    *   $T_{above}$: Time in seconds the player has been above the health threshold.
+    *   $T_{delay}$: `HighHealthDelaySeconds` (default: 10s).
+    *   $C_{rate}$: `HighHealthDamageIncreasePerSecond` (default: 1).
+    *   $C_{max}$: `HighHealthDamageMaximum` (default: 100).
 
 ---
-
-## 2. Boss Scaling Model
 
 ## 2. Boss Scaling Model
 
@@ -138,82 +95,67 @@ The boss scaling model adjusts the boss's defense and offense dynamically based 
 
 The mod calculates an "Ideal Time" based on the boss's current health percentage.
 
-$$
-T_{ideal} = T_{total} \cdot (1 - H_{pct})
-$$
+*   **Ideal Time:**
+    $$T_{ideal} = T_{total} \cdot (1 - H_{pct})$$
 
-The difference between the actual time alive and the ideal time is calculated in minutes.
+*   **Time Difference (Minutes):**
+    $$\Delta T = \frac{T_{alive} - T_{ideal}}{60}$$
 
-$$
-\Delta T = \frac{T_{alive} - T_{ideal}}{60}
-$$
+*   **Scaling Factor:**
+    If $|\Delta T| > T_{deadzone}$:
+    $$M_{pace} = 1 + 1.0 \cdot (|\Delta T| - T_{deadzone})^2$$
+    $$M_{pace} = \min(M_{pace}, C_{max\_def})$$
 
-A deadzone is applied where no scaling occurs if the pace is close to ideal.
+*   **Application:**
+    *   **Too Slow ($\Delta T > 0$):** Boss offense increases.
+        $$D_{boss\_in} \leftarrow D_{boss\_in} \times M_{pace}$$
+    *   **Too Fast ($\Delta T < 0$):** Boss defense increases.
+        $$D_{boss\_in} \leftarrow D_{boss\_in} / M_{pace}$$
 
-If $|\Delta T| > T_{deadzone}$:
-
-$$
-M_{pace} = 1 + 1.0 \cdot (|\Delta T| - T_{deadzone})^2
-$$
-
-$$
-M_{pace} = \min(M_{pace}, C_{max\_def})
-$$
-
-#### Application:
-
--   **Too Slow ($\Delta T > 0$)**: The boss is dying too slowly. Increase boss offense (boss takes more damage).
-    $$
-    D_{boss\_in} \leftarrow D_{boss\_in} \times M_{pace}
-    $$
--   **Too Fast ($\Delta T < 0$)**: The boss is dying too quickly. Increase boss defense (boss takes less damage).
-    $$
-    D_{boss\_in} \leftarrow D_{boss\_in} / M_{pace}
-    $$
-
-Where:
-
--   $T_{total}$ is `ExpectedTotalMinutes` (converted to ticks).
--   $H_{pct}$ is the current health percentage ($0.0 - 1.0$).
--   $T_{deadzone}$ is `ExpectedTotalMinutes / 5`.
+    Where:
+    *   $T_{total}$: `ExpectedTotalMinutes` (converted to ticks).
+    *   $H_{pct}$: Current health percentage ($0.0 - 1.0$).
+    *   $T_{deadzone}$: `ExpectedTotalMinutes / 5`.
 
 ### 2.2 Weapon Adaptation ($W_{adapt}$)
 
-The mod tracks damage from specific player-weapon combinations to prevent one strategy from dominating.
+The boss adapts to a specific Player/Weapon combination (a "Combo") if that combo contributes a disproportionately high amount of damage during a **10% HP phase** (the implementation uses `HitPointBuckets = 10`). The current code updates a running average per-combo using an Exponential Moving Average (EMA) and applies reductions when a combo dominates while the fight is progressing faster than expected.
 
-#### Running Average Calculation
+*   **Implementation details (current):**
+    *   **Combo Key:** $(\text{playerId}, \text{weaponKey})$.
+    *   **Phase Damage:** $D_{phase}^{(i,w)}$ — damage recorded for combo $(i,w)$ during the current 10% HP phase (stored in `comboDamagePhase`).
+    *   **Running Average:** $\bar{D}_{run}^{(i,w)}$ stored in `comboDamageRunning` and updated with EMA.
+    *   **Smoothing Factor:** $\alpha$ is `PhaseAvgAlpha` (set to `0.4` in `BossScaling.cs`).
+    *   **Evaluation cadence:** Per 10% HP interval; after evaluation `comboDamagePhase` is cleared and `comboDamageRunning` is updated.
 
-$$
-D_{running} = (1 - \alpha) \cdot D_{prev} + \alpha \cdot D_{phase}
-$$
+*   **EMA Update (on phase boundary):**
+    $$\bar{D}_{run}^{(i,w)} \leftarrow (1-\alpha)\,\bar{D}_{run}^{(i,w)} + \alpha\,D_{phase}^{(i,w)}$$
 
-Where $\alpha = 0.4$.
+*   **Comparison to others:**
+    *   Let $N$ be the number of running combos ($N = |\text{comboDamageRunning}|$).
+    *   Total running damage: $D_{total}^{run} = \sum_{j,v} \bar{D}_{run}^{(j,v)}$.
+    *   Mean of others' running damage (code uses `Math.Max(1, N-1)`):
+        $$\bar{D}_{others}^{(i,w)} = \frac{D_{total}^{run} - \bar{D}_{run}^{(i,w)}}{\max(1,\,N-1)}$$
+    *   Damage ratio:
+        $$R^{(i,w)} = \frac{\bar{D}_{run}^{(i,w)}}{\bar{D}_{others}^{(i,w)}}$$
 
-#### Comparison to Mean
+*   **Adaptation conditions (current):**
+    *   `WeaponAdaptationEnabled` must be true.
+    *   At least two combos must exist (`N > 1`).
+    *   The combo's running damage must exceed `WeaponAdaptationMinDamage`.
+    *   If $R^{(i,w)} \ge$ `WeaponAdaptationStartMultiplier`, a warning message is emitted for that combo.
+    *   If $R^{(i,w)} \ge$ `WeaponAdaptationCompleteMultiplier` AND the phase is "too fast" (the code sets `phaseTooFast = currentDefenseModifier > 1.0`), the combo is adapted (reduced).
 
-The damage of a specific combo is compared to the mean of all other combos.
+*   **Adaptation factor (stored in `AdaptationFactors` for groups / `comboAdaptationFactor` for single NPCs):**
+    Let `maxReduction` = `WeaponAdaptationMaxReduction`. The code computes:
+    $$\lambda = \max\big(\text{maxReduction},\,\min\big(1.0,\,\frac{\bar{D}_{others}^{(i,w)}}{\bar{D}_{run}^{(i,w)}}\big)\big)\;,$$
+    and stores `\lambda` as the combo's factor (clamped to `maxReduction` as a lower bound).
 
-$$
-\mu_{others} = \frac{\sum D_{running} - D_{combo}}{N_{combos} - 1}
-$$
+*   **Damage application:** When a hit from a combo with a stored `\lambda < 1` occurs, hit damage is multiplied by `\lambda` in `ModifyHitByItem` / `ModifyHitByProjectile`.
 
-$$
-R_{ratio} = \frac{D_{combo}}{\mu_{others}}
-$$
+*   **Weapon key encoding (current):**
+    *   For items: `weaponKey = item.type + 1` (positive keys).
+    *   For projectiles: if the owner's held item is valid the held item key is used; otherwise projectiles use `-(projectile.type + 1)` (unique negative keys).
 
-#### Adaptation Factor
+This matches the current code in `BossGroupTracker.cs` (median-based algorithm; `PhaseAvgAlpha = 0.4`, `HitPointBuckets = 10`) and the server's group-first architecture: `BossGroupTracker` handles recording (`ReportComboDamage`), evaluation (`EvaluateWeaponAdaptationOnInterval`), and synchronization (`UpdateAdaptationFactor`). All bosses are treated as groups (single-member groups for solo bosses), ensuring unified handling.
 
-If $R_{ratio} \ge K_{complete}$ AND the boss is currently scaling defense (dying too fast):
-
-$$
-F_{adapt} = \max\left(K_{max\_red}, \min\left(1, \frac{\mu_{others}}{D_{combo}}\right)\right)
-$$
-
-$$
-D_{boss\_in} \leftarrow D_{boss\_in} \times F_{adapt}
-$$
-
-Where:
-
--   $K_{complete}$ is `WeaponAdaptationCompleteMultiplier`.
--   $K_{max\_red}$ is `WeaponAdaptationMaxReduction`.

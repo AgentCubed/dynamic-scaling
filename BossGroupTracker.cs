@@ -78,6 +78,8 @@ namespace DynamicScaling
             nextGroupId = 0;
             bossBarSystem = null;
             clientModifiers.Clear();
+            clientScalingDisabled.Clear();
+            clientAdaptationFactors.Clear();
             // Clear client caches in BossScaling as well
             BossScaling.ClearClientCaches();
         }
@@ -392,9 +394,21 @@ namespace DynamicScaling
         // Get group data for an NPC
         public static BossGroupData GetGroupData(NPC npc)
         {
-            if (!npc.boss || !npcToGroup.TryGetValue(npc.whoAmI, out int groupId))
+            if (!npc.boss)
             {
                 return null;
+            }
+
+            if (!npcToGroup.TryGetValue(npc.whoAmI, out int groupId))
+            {
+                // Create a single-member group for this boss NPC
+                groupId = nextGroupId++;
+                npcToGroup[npc.whoAmI] = groupId;
+                groupData[groupId] = new BossGroupData
+                {
+                    GroupId = groupId,
+                    SpawnTime = Main.time
+                };
             }
 
             // Update health before returning
@@ -462,8 +476,10 @@ namespace DynamicScaling
             {
                 clientAdaptationFactors.Remove(npcWhoAmI);
             }
-            // Remove client-side scaling disabled cache if present
-            try { BossScaling.RemoveClientScalingDisabled(npcWhoAmI); } catch { }
+            if (clientScalingDisabled.ContainsKey(npcWhoAmI))
+            {
+                clientScalingDisabled.Remove(npcWhoAmI);
+            }
         }
 
         // Get all NPCs in the same group
@@ -482,6 +498,7 @@ namespace DynamicScaling
 
         // Client-side cache of modifiers per NPC whoAmI
         private static Dictionary<int, (float defenseModifier, float offenseModifier)> clientModifiers = new Dictionary<int, (float, float)>();
+        private static Dictionary<int, bool> clientScalingDisabled = new Dictionary<int, bool>();
         // Client-side cache of adaptation factors per NPC whoAmI
         private static Dictionary<int, Dictionary<(int playerId, int weaponKey), float>> clientAdaptationFactors = new Dictionary<int, Dictionary<(int, int), float>>();
 
@@ -501,6 +518,16 @@ namespace DynamicScaling
         public static void SetClientModifiers(int npcWhoAmI, float defense, float offense)
         {
             clientModifiers[npcWhoAmI] = (defense, offense);
+        }
+
+        public static void SetClientScalingDisabled(int npcWhoAmI, bool disabled)
+        {
+            clientScalingDisabled[npcWhoAmI] = disabled;
+        }
+
+        public static bool TryGetClientScalingDisabled(int npcWhoAmI, out bool disabled)
+        {
+            return clientScalingDisabled.TryGetValue(npcWhoAmI, out disabled);
         }
 
         public static void SetClientAdaptationFactor(int npcWhoAmI, (int playerId, int weaponKey) comboKey, float factor)
@@ -599,7 +626,7 @@ namespace DynamicScaling
             }
         }
 
-        private static void EvaluateWeaponAdaptationOnInterval(NPC npc, BossGroupData groupData)
+        public static void EvaluateWeaponAdaptationOnInterval(NPC npc, BossGroupData groupData)
         {
             var config = ModContent.GetInstance<ServerConfig>();
             if (config?.WeaponAdaptationEnabled != true) return;
@@ -698,6 +725,29 @@ namespace DynamicScaling
 
             groupData.WeaponDamagePhase.Clear();
             groupData.LastPhaseTime = Main.time;
+        }
+
+        // Helper: try to get an adaptation factor from group data for a specific npc and combo key
+        public static bool TryGetAdaptationFactorForNPC(int npcWhoAmI, (int playerId, int weaponKey) comboKey, out float factor)
+        {
+            factor = 1f;
+            if (npcToGroup.TryGetValue(npcWhoAmI, out int groupId) && groupData.TryGetValue(groupId, out var data))
+            {
+                if (data.AdaptationFactors.TryGetValue(comboKey, out float f))
+                {
+                    factor = f;
+                    return true;
+                }
+            }
+
+            // Fallback: check client-side cached adaptation factors (if client)
+            if (TryGetClientAdaptationFactor(npcWhoAmI, comboKey, out float clientFactor))
+            {
+                factor = clientFactor;
+                return true;
+            }
+
+            return false;
         }
 
         private static void UpdateAdaptationFactor(NPC npc, BossGroupData groupData, (int playerId, int weaponKey) key, float factor)

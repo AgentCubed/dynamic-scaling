@@ -143,11 +143,11 @@ namespace DynamicScaling
                     NPC npc = Main.npc[npcIndex];
                     if (npc != null && npc.active)
                     {
-                        var g = npc.GetGlobalNPC<BossScaling>();
-                        if (g != null)
+                        var gdata = BossGroupTracker.GetGroupData(npc);
+                        if (gdata != null)
                         {
-                            g.currentDefenseModifier = def;
-                            g.currentOffenseModifier = off;
+                            gdata.CurrentDefenseModifier = def;
+                            gdata.CurrentOffenseModifier = off;
                         }
                     }
                 }
@@ -184,7 +184,7 @@ namespace DynamicScaling
 
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                BossScaling.SetClientAdaptationFactor(npcIndex, (playerId, weaponKey), factor);
+                BossGroupTracker.SetClientAdaptationFactor(npcIndex, (playerId, weaponKey), factor);
                 if (config?.DebugMode == true)
                 {
                     Utils.EmitDebug($"[BossSyncPacket] Client adaptation cache updated: npcIdx={npcIndex}, player={playerId}, weaponKey={weaponKey}, factor={factor:F2}", Microsoft.Xna.Framework.Color.Green);
@@ -212,12 +212,12 @@ namespace DynamicScaling
                     NPC npc = Main.npc[npcIndex];
                     if (npc != null && npc.active)
                     {
-                        var g = npc.GetGlobalNPC<BossScaling>();
-                        if (g != null)
+                        var gdata = BossGroupTracker.GetGroupData(npc);
+                        if (gdata != null)
                         {
-                            g.isScalingDisabled = disabled;
+                            gdata.IsScalingDisabled = disabled;
                             if (config?.DebugMode == true)
-                                Utils.EmitDebug($"[BossSyncPacket] Set instance isScalingDisabled for npcIdx={npcIndex} to {disabled}", Microsoft.Xna.Framework.Color.Green);
+                                Utils.EmitDebug($"[BossSyncPacket] Set group IsScalingDisabled for npcIdx={npcIndex} to {disabled}", Microsoft.Xna.Framework.Color.Green);
                         }
                     }
                 }

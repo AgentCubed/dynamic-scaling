@@ -31,31 +31,29 @@ namespace DynamicScaling
 
         public override bool InstancePerEntity => true;
 
-        public double spawnTime = -1;
-        public double currentDefenseModifier = 1.0;
-        public double currentOffenseModifier = 1.0;
-        public int lastHpInterval = 100;
-        public double lastTimeDifference = 0.0;
-        public bool isScalingDisabled = false;
-
-        // Player+Weapon adaptation state
-        private System.Collections.Generic.Dictionary<(int playerId, int weaponKey), double> comboDamagePhase = new System.Collections.Generic.Dictionary<(int, int), double>();
-        private System.Collections.Generic.Dictionary<(int playerId, int weaponKey), double> comboDamageRunning = new System.Collections.Generic.Dictionary<(int, int), double>();
-        private const double PhaseAvgAlpha = 0.4;
-        private System.Collections.Generic.Dictionary<(int playerId, int weaponKey), float> comboAdaptationFactor = new System.Collections.Generic.Dictionary<(int, int), float>();
-        private System.Collections.Generic.HashSet<(int playerId, int weaponKey)> comboAdaptationWarned = new System.Collections.Generic.HashSet<(int, int)>();
-        private double lastPhaseTime = 0.0;
+        // All state moved to BossGroupTracker for unified group-based handling
 
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
             if (npc.boss)
             {
-                ResetForNewBoss();
+                var gdata = BossGroupTracker.GetGroupData(npc);
+                if (gdata != null)
+                {
+                    gdata.SpawnTime = Main.time;
+                    gdata.CurrentDefenseModifier = 1.0;
+                    gdata.CurrentOffenseModifier = 1.0;
+                    gdata.LastHpInterval = FullHealthPercent;
+                    gdata.LastTimeDifference = 0.0;
+                    gdata.PlayerDeathsThisFight = 0;
+                    gdata.LastPhaseTime = gdata.SpawnTime;
+                    gdata.WeaponDamagePhase.Clear();
+                    gdata.WeaponDamageRunning.Clear();
+                    gdata.AdaptationFactors.Clear();
+                    gdata.AdaptationWarned.Clear();
+                }
+
                 ApplyConfigOverrides();
-                currentDefenseModifier = 1.0;
-                currentOffenseModifier = 1.0;
-                lastHpInterval = 100;
-                lastTimeDifference = 0.0;
 
                 var config = ModContent.GetInstance<ServerConfig>();
                 try
@@ -80,17 +78,17 @@ namespace DynamicScaling
                     if (config?.DebugMode == true)
                         Main.NewText($"Boss {npc.FullName} spawned. Using default expected time: 4 min", Color.Gray);
                 }
-                isScalingDisabled = (config?.ExpectedTotalMinutes == 0);
+                bool scalingDisabled = (config?.ExpectedTotalMinutes == 0);
 
                 // If configured, disable time scaling for bosses with progression less than threshold (from BossChecklist)
                 try
                 {
-                    if (!isScalingDisabled && config?.BossProgressionThresholdValue > 0)
+                    if (!scalingDisabled && config?.BossProgressionThresholdValue > 0)
                     {
                         double? prog = BossChecklist.GetBossChecklistProgressionForNPC(npc.type);
                         if (prog.HasValue && prog.Value < config.BossProgressionThresholdValue)
                         {
-                            isScalingDisabled = true;
+                            scalingDisabled = true;
                             if (config.DebugMode)
                                 Utils.EmitDebug($"[Boss] Scaling disabled for {npc.FullName} (progression {prog.Value} < threshold {config.BossProgressionThresholdValue})", Color.Yellow);
                         }
@@ -98,13 +96,15 @@ namespace DynamicScaling
                 }
                 catch { }
 
+                gdata.IsScalingDisabled = scalingDisabled;
+
                 // Sync scaling disabled value to clients
                 try
                 {
                     if (Main.netMode == NetmodeID.Server)
                     {
-                        BossSyncPacket.SendScalingDisabledForNPC(npc.whoAmI, isScalingDisabled);
-                        BossSyncPacket.SendBossModifiersForNPC(npc.whoAmI, (float)currentDefenseModifier, (float)currentOffenseModifier);
+                        BossSyncPacket.SendScalingDisabledForNPC(npc.whoAmI, scalingDisabled);
+                        BossSyncPacket.SendBossModifiersForNPC(npc.whoAmI, (float)gdata.CurrentDefenseModifier, (float)gdata.CurrentOffenseModifier);
                     }
                 }
                 catch { }
@@ -124,7 +124,9 @@ namespace DynamicScaling
                 // Only the server writes extra data; clients don't need to send it.
                 if (Main.netMode == NetmodeID.Server)
                 {
-                    binaryWriter.Write(isScalingDisabled);
+                    var gdata = BossGroupTracker.GetGroupData(npc);
+                    bool scalingDisabled = gdata?.IsScalingDisabled ?? false;
+                    binaryWriter.Write(scalingDisabled);
                 }
             }
             catch { }
@@ -138,16 +140,19 @@ namespace DynamicScaling
                 // When we receive spawn extra AI, the server may have indicated scaling is disabled
                 bool disabled = false;
                 try { disabled = binaryReader.ReadBoolean(); } catch { }
-                SetClientScalingDisabled(npc.whoAmI, disabled);
-                // If instance exists, update instance field as well
-                isScalingDisabled = disabled;
+                BossGroupTracker.SetClientScalingDisabled(npc.whoAmI, disabled);
+                // Update group data if available
+                var gdata = BossGroupTracker.GetGroupData(npc);
+                if (gdata != null)
+                {
+                    gdata.IsScalingDisabled = disabled;
+                }
             }
             catch { }
         }
 
         // Client-side cache for network-synced modifiers and adaptation factors.
         private static Dictionary<int, (float defenseModifier, float offenseModifier)> clientModifiers = new Dictionary<int, (float, float)>();
-        private static Dictionary<int, Dictionary<(int playerId, int weaponKey), float>> clientAdaptationFactors = new Dictionary<int, Dictionary<(int, int), float>>();
         private static Dictionary<int, bool> clientScalingDisabled = new Dictionary<int, bool>();
 
         public static bool TryGetClientModifiers(int npcWhoAmI, out float defense, out float offense)
@@ -183,31 +188,9 @@ namespace DynamicScaling
             clientModifiers[npcWhoAmI] = (defense, offense);
         }
 
-        public static void SetClientAdaptationFactor(int npcWhoAmI, (int playerId, int weaponKey) key, float factor)
-        {
-            if (!clientAdaptationFactors.TryGetValue(npcWhoAmI, out var dict))
-            {
-                dict = new Dictionary<(int, int), float>();
-                clientAdaptationFactors[npcWhoAmI] = dict;
-            }
-            dict[key] = factor;
-        }
-
-        public static bool TryGetClientAdaptationFactor(int npcWhoAmI, (int playerId, int weaponKey) key, out float factor)
-        {
-            factor = 1f;
-            if (clientAdaptationFactors.TryGetValue(npcWhoAmI, out var dict) && dict.TryGetValue(key, out float val))
-            {
-                factor = val;
-                return true;
-            }
-            return false;
-        }
-
         public static void ClearClientCaches()
         {
             clientModifiers.Clear();
-            clientAdaptationFactors.Clear();
             clientScalingDisabled.Clear();
         }
 
@@ -225,19 +208,17 @@ namespace DynamicScaling
             if (npcWhoAmI < 0 || npcWhoAmI >= Main.maxNPCs) return;
             var npc = Main.npc[npcWhoAmI];
             if (npc == null || !npc.active || !npc.boss) return;
-            var g = npc.GetGlobalNPC<BossScaling>();
-            if (g == null) return;
-            g.RecordComboDamage(npc, playerId, weaponKey, amount);
+            // Route the report to the group tracker
+            BossGroupTracker.ReportComboDamage(npcWhoAmI, playerId, weaponKey, amount);
         }
 
         public static int TotalBossDeaths => totalBossDeaths;
-
-        public int PlayerDeathsThisFight { get; private set; }
 
         public static void RecordBossDeath()
         {
             totalBossDeaths++;
 
+            var processedGroups = new HashSet<int>();
             for (int i = 0; i < Main.maxNPCs; i++)
             {
                 NPC npc = Main.npc[i];
@@ -246,7 +227,12 @@ namespace DynamicScaling
                     continue;
                 }
 
-                npc.GetGlobalNPC<BossScaling>().PlayerDeathsThisFight++;
+                var gdata = BossGroupTracker.GetGroupData(npc);
+                if (gdata != null && !processedGroups.Contains(gdata.GroupId))
+                {
+                    gdata.PlayerDeathsThisFight++;
+                    processedGroups.Add(gdata.GroupId);
+                }
             }
         }
 
@@ -260,7 +246,11 @@ namespace DynamicScaling
                     continue;
                 }
 
-                return npc.GetGlobalNPC<BossScaling>().PlayerDeathsThisFight;
+                var gdata = BossGroupTracker.GetGroupData(npc);
+                if (gdata != null)
+                {
+                    return gdata.PlayerDeathsThisFight;
+                }
             }
 
             return 0;
@@ -273,22 +263,6 @@ namespace DynamicScaling
                 BossBar.ClearCache();
                 try { BossGroupTracker.CleanupDeadNPC(npc.whoAmI); } catch { }
             }
-        }
-
-        private void ResetForNewBoss()
-        {
-            spawnTime = Main.time;
-            currentDefenseModifier = 1.0;
-            currentOffenseModifier = 1.0;
-            lastHpInterval = FullHealthPercent;
-            lastTimeDifference = 0.0;
-            PlayerDeathsThisFight = 0;
-            SetDefaultConfigValues();
-            comboDamagePhase.Clear();
-            comboDamageRunning.Clear();
-            comboAdaptationFactor.Clear();
-            comboAdaptationWarned.Clear();
-            lastPhaseTime = spawnTime;
         }
 
         private void ApplyConfigOverrides()
@@ -316,23 +290,24 @@ namespace DynamicScaling
 
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
-            if (!npc.boss || spawnTime < 0)
+            var gdata = BossGroupTracker.GetGroupData(npc);
+            if (gdata == null || gdata.SpawnTime < 0)
             {
                 return;
             }
 
             // Prefer client-side cached flag for clients; server uses instance flag assigned on spawn
-            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
+            if (Main.netMode == NetmodeID.MultiplayerClient && BossGroupTracker.TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
             {
                 return;
             }
 
-            if (isScalingDisabled)
+            if (gdata.IsScalingDisabled)
             {
                 return;
             }
 
-            double timeAlive = Main.time - spawnTime;
+            double timeAlive = Main.time - gdata.SpawnTime;
 
             if (timeAlive <= 60)
             {
@@ -351,13 +326,13 @@ namespace DynamicScaling
 
             int currentHpInterval = (int)Math.Floor(hpPercent * 10) * 10;
 
-            if (currentHpInterval < lastHpInterval)
+            if (currentHpInterval < gdata.LastHpInterval)
             {
-                UpdatePaceModifiers(npc, timeAlive, currentHpInterval, hpPercent);
-                EvaluateWeaponAdaptationOnInterval(npc);
+                UpdatePaceModifiers(npc, gdata, timeAlive, currentHpInterval, hpPercent);
+                BossGroupTracker.EvaluateWeaponAdaptationOnInterval(npc, gdata);
             }
 
-            ApplyDamageModifiers(ref modifiers);
+            ApplyDamageModifiers(gdata, ref modifiers);
 
             // Apply Expected Players scaling (Nerf boss damage if fewer players than expected)
             var config = ModContent.GetInstance<ServerConfig>();
@@ -396,10 +371,15 @@ namespace DynamicScaling
             if (playerId >= 0)
             {
                 var comboKey = (playerId, weaponKey);
-                if (comboAdaptationFactor.TryGetValue(comboKey, out float factor) && factor < 1f)
+                float factor = 1f;
+                // Use group-adaptation factors
+                if (BossGroupTracker.TryGetAdaptationFactorForNPC(npc.whoAmI, comboKey, out float groupFactor))
                 {
-                    modifiers.FinalDamage *= factor;
+                    factor = groupFactor;
                 }
+
+                if (factor < 1f)
+                    modifiers.FinalDamage *= factor;
             }
         }
 
@@ -421,14 +401,18 @@ namespace DynamicScaling
                 int weaponKey = GetWeaponKeyFromProjectile(projectile);
                 int playerId = owner.whoAmI;
                 var comboKey = (playerId, weaponKey);
-                if (comboAdaptationFactor.TryGetValue(comboKey, out float factor) && factor < 1f)
+                float factor = 1f;
+                if (BossGroupTracker.TryGetAdaptationFactorForNPC(npc.whoAmI, comboKey, out float groupFactor))
                 {
-                    modifiers.FinalDamage *= factor;
+                    factor = groupFactor;
                 }
+
+                if (factor < 1f)
+                    modifiers.FinalDamage *= factor;
             }
         }
 
-        private void UpdatePaceModifiers(NPC npc, double timeAlive, int currentHpInterval, double hpPercent)
+        private void UpdatePaceModifiers(NPC npc, BossGroupTracker.BossGroupData gdata, double timeAlive, int currentHpInterval, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
             if (config == null)
@@ -437,17 +421,17 @@ namespace DynamicScaling
             double hpLost = 1.0 - currentHpInterval / (double)FullHealthPercent;
             double idealTime = idealTotalTicks * hpLost;
             double timeDifferenceMinutes = (timeAlive - idealTime) / 3600.0;
-            lastTimeDifference = timeDifferenceMinutes;
+            gdata.LastTimeDifference = timeDifferenceMinutes;
 
             double absTimeDiff = Math.Abs(timeDifferenceMinutes);
 
-            double oldDefense = currentDefenseModifier;
-            double oldOffense = currentOffenseModifier;
+            double oldDefense = gdata.CurrentDefenseModifier;
+            double oldOffense = gdata.CurrentOffenseModifier;
 
             if (absTimeDiff <= deadZoneMinutes)
             {
-                currentDefenseModifier = 1.0;
-                currentOffenseModifier = 1.0;
+                gdata.CurrentDefenseModifier = 1.0;
+                gdata.CurrentOffenseModifier = 1.0;
             }
             else
             {
@@ -457,215 +441,28 @@ namespace DynamicScaling
 
                 if (timeDifferenceMinutes > 0)
                 {
-                    currentOffenseModifier = modifier;
-                    currentDefenseModifier = 1.0;
+                    gdata.CurrentOffenseModifier = modifier;
+                    gdata.CurrentDefenseModifier = 1.0;
                 }
                 else
                 {
-                    currentDefenseModifier = modifier;
-                    currentOffenseModifier = 1.0;
+                    gdata.CurrentDefenseModifier = modifier;
+                    gdata.CurrentOffenseModifier = 1.0;
                 }
             }
 
             // Emit per-NPC debug at the 10% interval boundary
             if (config?.DebugMode == true)
             {
-                EmitDebugText(npc, hpPercent);
+                EmitDebugText(npc, gdata, hpPercent);
             }
 
-            lastHpInterval = currentHpInterval;
+            gdata.LastHpInterval = currentHpInterval;
         }
 
-        private void EvaluateWeaponAdaptationOnInterval(NPC npc)
-        {
-            var config = ModContent.GetInstance<ServerConfig>();
-            if (config?.WeaponAdaptationEnabled != true)
-            {
-                return;
-            }
+        // Per-instance adaptation checking has been consolidated to BossGroupTracker.
 
-            var keys = comboDamagePhase.Keys.ToList();
-            if (keys.Count <= 0)
-            {
-                if (config?.DebugMode == true)
-                {
-                    Main.NewText($"{npc.GivenOrTypeName} reached 10% HP but NO damage was recorded this phase", Color.Red);
-                }
-                lastPhaseTime = Main.time;
-                return;
-            }
-
-            bool phaseTooFast = currentDefenseModifier > 1.0;
-
-            if (config?.DebugMode == true)
-            {
-                Main.NewText($"{npc.GivenOrTypeName} evaluating weapon adaptation: {keys.Count} combos, phaseTooFast={phaseTooFast}", Color.Gray);
-            }
-
-            foreach (var key in keys)
-            {
-                double curPhaseDamage = comboDamagePhase.TryGetValue(key, out double val) ? val : 0.0;
-                double prevRunning = comboDamageRunning.TryGetValue(key, out double prev) ? prev : 0.0;
-                double newRunning = (1.0 - PhaseAvgAlpha) * prevRunning + PhaseAvgAlpha * curPhaseDamage;
-                comboDamageRunning[key] = newRunning;
-            }
-
-            var runningKeys = comboDamageRunning.Keys.ToList();
-            foreach (var key in runningKeys)
-            {
-                CheckAdaptationForComboRunning(npc, key, phaseTooFast);
-            }
-
-            if (config?.DebugMode == true)
-            {
-                EmitComboAdaptationProximity(npc);
-            }
-
-            comboDamagePhase.Clear();
-            lastPhaseTime = Main.time;
-        }
-
-        private void CheckAdaptationForComboRunning(NPC npc, (int playerId, int weaponKey) comboKey, bool phaseTooFast)
-        {
-            var config = ModContent.GetInstance<ServerConfig>();
-            if (config == null)
-            {
-                return;
-            }
-
-            if (!comboDamageRunning.TryGetValue(comboKey, out double comboRunning))
-            {
-                return;
-            }
-
-            int countRunning = comboDamageRunning.Count;
-            if (countRunning <= 1)
-            {
-                return;
-            }
-
-            double totalRunning = 0.0;
-            foreach (var v in comboDamageRunning.Values) totalRunning += v;
-            double meanOthers = (totalRunning - comboRunning) / Math.Max(1, countRunning - 1);
-            if (meanOthers <= 0.0)
-            {
-                return;
-            }
-
-            double startMultiplier = config.WeaponAdaptationStartMultiplier;
-            double completeMultiplier = config.WeaponAdaptationCompleteMultiplier;
-            double minDamage = config.WeaponAdaptationMinDamage;
-            double maxReduction = config.WeaponAdaptationMaxReduction;
-
-            if (comboRunning < minDamage)
-            {
-                return;
-            }
-
-            double ratio = comboRunning / meanOthers;
-
-            if (ratio >= startMultiplier && !comboAdaptationWarned.Contains(comboKey) && !comboAdaptationFactor.ContainsKey(comboKey))
-            {
-                comboAdaptationWarned.Add(comboKey);
-                string playerName = GetPlayerName(comboKey.playerId);
-                string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossBeginningAdaptation", npc.GivenOrTypeName, playerName, weaponName), Color.Orange);
-            }
-
-            if (ratio >= completeMultiplier && phaseTooFast)
-            {
-                float factor = (float)Math.Max(maxReduction, Math.Min(1.0, meanOthers / comboRunning));
-                if (comboAdaptationFactor.TryGetValue(comboKey, out float existingFactor))
-                {
-                    if (factor < existingFactor - 0.001f)
-                    {
-                        comboAdaptationFactor[comboKey] = factor;
-                        string playerName = GetPlayerName(comboKey.playerId);
-                        string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                        Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossAdapted", npc.GivenOrTypeName, playerName, weaponName), Color.Yellow);
-                    }
-                }
-                else
-                {
-                    comboAdaptationFactor[comboKey] = factor;
-                    string playerName = GetPlayerName(comboKey.playerId);
-                    string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                    Main.NewText(Language.GetTextValue("Mods.DynamicScaling.Messages.BossAdapted", npc.GivenOrTypeName, playerName, weaponName), Color.Yellow);
-                }
-            }
-            else
-            {
-                if (config?.DebugMode == true)
-                {
-                    string playerName = GetPlayerName(comboKey.playerId);
-                    string weaponName = GetWeaponNameFromKey(comboKey.weaponKey);
-                    string reason = ratio < completeMultiplier ? $"ratio {ratio:F2} < {completeMultiplier:F2}" : "phase not too fast";
-                    Main.NewText($"{npc.GivenOrTypeName} did not adapt to {playerName}'s {weaponName}: {reason}", Color.Gray);
-                }
-            }
-        }
-
-        private void EmitComboAdaptationProximity(NPC npc)
-        {
-            var config = ModContent.GetInstance<ServerConfig>();
-            if (config == null || comboDamagePhase.Count <= 0)
-            {
-                return;
-            }
-            int comboCount = comboDamagePhase.Count;
-            if (comboCount <= 1)
-            {
-                if (config?.DebugMode == true)
-                    Main.NewText($"{npc.GivenOrTypeName} adaptation: not enough combos to evaluate proximity (count={comboCount})", Color.Gray);
-                return;
-            }
-
-            double startMultiplier = config.WeaponAdaptationStartMultiplier;
-            double completeMultiplier = config.WeaponAdaptationCompleteMultiplier;
-
-            double phaseDurationTicks = Math.Max(1.0, Main.time - lastPhaseTime);
-            double phaseDurationMinutes = phaseDurationTicks / 3600.0;
-            double totalPhase = 0.0;
-            foreach (var v in comboDamagePhase.Values) totalPhase += v;
-            foreach (var kvp in comboDamagePhase)
-            {
-                var key = kvp.Key;
-                double comboDmg = kvp.Value;
-                double meanOthers = (totalPhase - comboDmg) / Math.Max(1, comboCount - 1);
-                if (meanOthers <= 0.0)
-                {
-                    continue;
-                }
-
-                double ratio = comboDmg / meanOthers;
-                double closeness = Math.Min(100.0, (ratio / completeMultiplier) * 100.0);
-                string playerName = GetPlayerName(key.playerId);
-                string weaponName = GetWeaponNameFromKey(key.weaponKey);
-
-                double dmgPerMinute = comboDmg / Math.Max(phaseDurationMinutes, 1e-6);
-                string proximityMsg = $"{playerName}'s {weaponName}: ratio={ratio:F2} (start={startMultiplier:F2},complete={completeMultiplier:F2}) {closeness:F1}% to complete, {comboDmg:F0} dmg this phase (~{dmgPerMinute:F1}/min)";
-                if (config?.DebugMode == true)
-                    Main.NewText($"{npc.GivenOrTypeName} adaptation check: {proximityMsg}", Color.Gray);
-            }
-        }
-
-        private void RecordComboDamage(NPC npc, int playerId, int weaponKey, int amount)
-        {
-            if (playerId < 0 || weaponKey == 0 || amount <= 0)
-            {
-                return;
-            }
-
-            var key = (playerId, weaponKey);
-            if (comboDamagePhase.TryGetValue(key, out double curPhase))
-            {
-                comboDamagePhase[key] = curPhase + amount;
-            }
-            else
-            {
-                comboDamagePhase[key] = amount;
-            }
-        }
+        // Per-instance adaptation proximity output is handled by BossGroupTracker.
 
         private int GetWeaponKeyFromItem(Item item)
         {
@@ -716,24 +513,24 @@ namespace DynamicScaling
             return "Unknown";
         }
 
-        private void EmitDebugText(NPC npc, double hpPercent)
+        private void EmitDebugText(NPC npc, BossGroupTracker.BossGroupData gdata, double hpPercent)
         {
             var config = ModContent.GetInstance<ServerConfig>();
             string paceMessage = "On Pace";
             double displayDefMod = 1.0; // What we show as the boss defense multiplier
 
             // If we are a multiplayer client, prefer the server-synced modifiers from the cache
-            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
+            if (Main.netMode == NetmodeID.MultiplayerClient && BossGroupTracker.TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
             {
                 // Use the client-cached defense modifier from the server for display
                 if (coff > 1.0f)
                 {
-                    paceMessage = $"Pace: +{lastTimeDifference:F1} min";
+                    paceMessage = $"Pace: +{gdata.LastTimeDifference:F1} min";
                     displayDefMod = 1.0 / coff;
                 }
                 else if (cdef > 1.0f)
                 {
-                    paceMessage = $"Pace: {lastTimeDifference:F1} min";
+                    paceMessage = $"Pace: {gdata.LastTimeDifference:F1} min";
                     displayDefMod = cdef;
                 }
                 if (config?.DebugMode == true)
@@ -742,35 +539,35 @@ namespace DynamicScaling
             }
 
             // If scaling disabled on the client use cached value for debug display
-            if (Main.netMode == NetmodeID.MultiplayerClient && TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
+            if (Main.netMode == NetmodeID.MultiplayerClient && BossGroupTracker.TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled) && clientDisabled)
             {
                 if (config?.DebugMode == true)
                     Main.NewText($"(SYNC) {(int)(hpPercent * FullHealthPercent)}% HP | Scaling disabled via server", Color.Gray);
                 return;
             }
 
-                if (currentOffenseModifier > 1.0)
+                if (gdata.CurrentOffenseModifier > 1.0)
                 {
                     // Player is slow: we increase player damage via currentOffenseModifier.
                     // For debug we want to show the equivalent boss defense multiplier (<1.0).
-                    paceMessage = $"Pace: +{lastTimeDifference:F1} min";
-                    displayDefMod = 1.0 / currentOffenseModifier;
+                    paceMessage = $"Pace: +{gdata.LastTimeDifference:F1} min";
+                    displayDefMod = 1.0 / gdata.CurrentOffenseModifier;
                 }
-                else if (currentDefenseModifier > 1.0)
+                else if (gdata.CurrentDefenseModifier > 1.0)
                 {
                     // Player is fast: boss defense is increased (player deals less).
-                    paceMessage = $"Pace: {lastTimeDifference:F1} min";
-                    displayDefMod = currentDefenseModifier;
+                    paceMessage = $"Pace: {gdata.LastTimeDifference:F1} min";
+                    displayDefMod = gdata.CurrentDefenseModifier;
                 }
 
             if (config?.DebugMode == true)
                 Main.NewText($"{(int)(hpPercent * FullHealthPercent)}% HP | {paceMessage} | {displayDefMod:F2}x Def", Color.Gray);
         }
 
-        private void ApplyDamageModifiers(ref NPC.HitModifiers modifiers)
+        private void ApplyDamageModifiers(BossGroupTracker.BossGroupData gdata, ref NPC.HitModifiers modifiers)
         {
-            modifiers.FinalDamage /= (float)currentDefenseModifier;
-            modifiers.FinalDamage *= (float)currentOffenseModifier;
+            modifiers.FinalDamage /= (float)gdata.CurrentDefenseModifier;
+            modifiers.FinalDamage *= (float)gdata.CurrentOffenseModifier;
         }
 
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
@@ -790,7 +587,7 @@ namespace DynamicScaling
             {
                 int weaponKey = GetWeaponKeyFromProjectile(projectile);
                 int playerId = owner.whoAmI;
-                RecordComboDamage(npc, playerId, weaponKey, damageDone);
+                BossGroupTracker.ReportComboDamage(npc.whoAmI, playerId, weaponKey, damageDone);
             }
         }
 
@@ -815,7 +612,7 @@ namespace DynamicScaling
             int playerId = player?.whoAmI ?? -1;
             if (playerId >= 0)
             {
-                RecordComboDamage(npc, playerId, weaponKey, damageDone);
+                BossGroupTracker.ReportComboDamage(npc.whoAmI, playerId, weaponKey, damageDone);
                 if (config?.DebugMode == true)
                 {
                     string playerName = player?.name ?? "Unknown";
@@ -833,31 +630,34 @@ namespace DynamicScaling
             // on the client so that client-side debug and read-only displays function.
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                if (npc.boss && spawnTime < 0)
+                if (npc.boss)
                 {
-                    // Initialize client-only state to avoid skipping scaling-related UI on clients.
-                    spawnTime = Main.time;
-                    ApplyConfigOverrides();
-                    currentDefenseModifier = 1.0;
-                    currentOffenseModifier = 1.0;
-                    lastHpInterval = FullHealthPercent;
-                    lastTimeDifference = 0.0;
-                    // Clear client-only caches to avoid displaying stale values
-                    comboDamagePhase.Clear();
-                    comboDamageRunning.Clear();
-                    comboAdaptationFactor.Clear();
-                    comboAdaptationWarned.Clear();
-                    lastPhaseTime = spawnTime;
-                    // Apply cached scaling disabled flag if server told us
-                    if (TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled))
+                    var gdata = BossGroupTracker.GetGroupData(npc);
+                    if (gdata != null && gdata.SpawnTime < 0)
                     {
-                        isScalingDisabled = clientDisabled;
-                    }
-                    // Apply cached defense/offense modifiers if available
-                    if (TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
-                    {
-                        currentDefenseModifier = cdef;
-                        currentOffenseModifier = coff;
+                        // Initialize client-only state to avoid skipping scaling-related UI on clients.
+                        gdata.SpawnTime = Main.time;
+                        ApplyConfigOverrides();
+                        gdata.CurrentDefenseModifier = 1.0;
+                        gdata.CurrentOffenseModifier = 1.0;
+                        gdata.LastHpInterval = FullHealthPercent;
+                        gdata.LastTimeDifference = 0.0;
+                        gdata.WeaponDamagePhase.Clear();
+                        gdata.WeaponDamageRunning.Clear();
+                        gdata.AdaptationFactors.Clear();
+                        gdata.AdaptationWarned.Clear();
+                        gdata.LastPhaseTime = gdata.SpawnTime;
+                        // Apply cached scaling disabled flag if server told us
+                        if (BossGroupTracker.TryGetClientScalingDisabled(npc.whoAmI, out bool clientDisabled))
+                        {
+                            gdata.IsScalingDisabled = clientDisabled;
+                        }
+                        // Apply cached defense/offense modifiers if available
+                        if (BossGroupTracker.TryGetClientModifiers(npc.whoAmI, out float cdef, out float coff))
+                        {
+                            gdata.CurrentDefenseModifier = cdef;
+                            gdata.CurrentOffenseModifier = coff;
+                        }
                     }
                 }
 
