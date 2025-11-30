@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Ne pas cibler si le plus faible"
 			Tooltip: Empêche les boss de cibler des joueurs dont la vie est dans un intervalle de 20 PV autour du joueur ayant la plus faible vie à portée.
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Adaptation d'arme"
 			BossDynamicDamageScaling: "[i:184] Scalabilité dynamique des dégâts (boss)"
 			PlayerHighHealthDamageScaling: "[i:184] Scalabilité dégâts haute santé (joueur)"
-			Admin: Paramètres administrateur
+			All Settings: Paramètres administrateur
 		}
 
 		HighHealthThreshold: {

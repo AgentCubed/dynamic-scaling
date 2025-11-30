@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Nicht auf niedrigstes Ziel anvisieren"
 			Tooltip: Verhindert, dass Bosse Spieler anvisieren, deren aktuelles Leben innerhalb von 20 LP des Spielers mit dem niedrigsten Leben in Reichweite liegt.
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Waffenanpassung"
 			BossDynamicDamageScaling: "[i:184] Dynamische Schadensskalierung (Boss)"
 			PlayerHighHealthDamageScaling: "[i:184] Spieler High-Health Schadensskalierung"
-			Admin: Admin-Einstellungen
+			All Settings: All Settings
 		}
 
 		HighHealthThreshold: {

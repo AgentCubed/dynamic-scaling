@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] 最低に近ければターゲットを解除"
 			Tooltip: "ボスが、範囲内で最低HPのプレイヤーとの差が 20 HP 以内のプレイヤーをターゲットするのを防ぎます。"
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 武器適応"
 			BossDynamicDamageScaling: "[i:184] ボスの動的ダメージスケーリング"
 			PlayerHighHealthDamageScaling: "[i:184] プレイヤー高HPによる追加ダメージ"
-			Admin: 管理者設定
+			All Settings: 管理者設定
 		}
 
 		HighHealthThreshold: {

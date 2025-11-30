@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] 若接近最低則停止目標鎖定"
 			Tooltip: "阻止首領鎖定那些其生命值與範圍內最低生命玩家差距在 20 HP 以內的玩家。"
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 武器自適應"
 			BossDynamicDamageScaling: "[i:184] 首領動態傷害縮放"
 			PlayerHighHealthDamageScaling: "[i:184] 玩家高生命額外傷害縮放"
-			Admin: 管理者設定
+			All Settings: 管理者設定
 		}
 
 		HighHealthThreshold: {

@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Stop Targeting If Lowest"
 			Tooltip: Prevents bosses from targeting players who are within 20 HP of the lowest health player in range.
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Weapon Adaptation"
 			BossDynamicDamageScaling: "[i:184] Boss Dynamic Damage Scaling"
 			PlayerHighHealthDamageScaling: "[i:184] Player High Health Damage Scaling"
-			Admin: Admin Settings
+			All Settings: All Settings
 		}
 
 		HighHealthThreshold: {

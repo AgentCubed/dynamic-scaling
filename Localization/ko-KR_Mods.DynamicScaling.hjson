@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] 최저에 가까우면 타겟 해제"
 			Tooltip: "범위 내에서 최저 체력 플레이어와 체력 차이가 20 HP 이내인 플레이어를 보스가 타겟하지 않도록 합니다."
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 무기 적응"
 			BossDynamicDamageScaling: "[i:184] 보스 동적 데미지 스케일링"
 			PlayerHighHealthDamageScaling: "[i:184] 플레이어 높은 체력 피해 스케일링"
-			Admin: 관리자 설정
+			All Settings: 관리자 설정
 		}
 
 		HighHealthThreshold: {

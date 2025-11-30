@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 #nullable enable
@@ -10,8 +11,9 @@ namespace DynamicScaling
 {
     public class BossProximityCache : ModSystem
     {
-        public const float BossRange = 300f * 16f;
-        public const float BossRangeSq = BossRange * BossRange;
+        private static float _bossRange = 500f * 16f;
+        public static float BossRange => _bossRange;
+        public static float BossRangeSq => BossRange * BossRange;
         private const int UpdateIntervalTicks = 6;
 
         private static readonly Dictionary<int, int> playerClosestBoss = new();
@@ -25,6 +27,10 @@ namespace DynamicScaling
                 return;
 
             lastUpdateFrame = frame;
+            if (Main.netMode == NetmodeID.Server)
+            {
+                _bossRange = ModContent.GetInstance<ServerConfig>().Range * 16f;
+            }
             RefreshCache();
         }
 

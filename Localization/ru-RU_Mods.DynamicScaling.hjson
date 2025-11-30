@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Не целиться, если цель самая слабая"
 			Tooltip: Предотвращает нацеливание боссов на игроков, у которых текущее здоровье в пределах 20 HP от игрока с наименьшим здоровьем в радиусе.
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Адаптация оружия"
 			BossDynamicDamageScaling: "[i:184] Динамическое масштабирование урона (босс)"
 			PlayerHighHealthDamageScaling: "[i:184] Масштабирование урона при высоком здоровье (игрок)"
-			Admin: Настройки администратора
+			All Settings: Настройки администратора
 		}
 
 		HighHealthThreshold: {

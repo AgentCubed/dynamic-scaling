@@ -47,6 +47,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		Range: {
+			Label: "[i:43] Range"
+			Tooltip: The range in pixels used for boss proximity detection.
+		}
+
 		StopTargetingIfLowest: {
 			Label: "[i:3202] Não mirar se for o mais baixo"
 			Tooltip: Evita que os chefes mirarem em jogadores cujo HP esteja dentro de 20 pontos do jogador com a menor vida na área.
@@ -110,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Adaptação de armas"
 			BossDynamicDamageScaling: "[i:184] Escalonamento dinâmico de dano (chefe)"
 			PlayerHighHealthDamageScaling: "[i:184] Escalonamento dano alto HP (jogador)"
-			Admin: Configurações de administrador
+			All Settings: Configurações de administrador
 		}
 
 		HighHealthThreshold: {
