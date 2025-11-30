@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] Reichweite"
+			Tooltip: Die Reichweite in Blöcken, die für die Boss-Näherungserkennung verwendet wird.
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Waffenanpassung"
 			BossDynamicDamageScaling: "[i:184] Dynamische Schadensskalierung (Boss)"
 			PlayerHighHealthDamageScaling: "[i:184] Spieler High-Health Schadensskalierung"
-			All Settings: All Settings
+			AllSettings: "[i:43] Alle Einstellungen"
 		}
 
 		HighHealthThreshold: {

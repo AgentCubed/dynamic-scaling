@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] 範囲"
+			Tooltip: "ボス近接検出に使用される範囲（ブロック単位）。"
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 武器適応"
 			BossDynamicDamageScaling: "[i:184] ボスの動的ダメージスケーリング"
 			PlayerHighHealthDamageScaling: "[i:184] プレイヤー高HPによる追加ダメージ"
-			All Settings: 管理者設定
+			AllSettings: "[i:43] すべての設定"
 		}
 
 		HighHealthThreshold: {
@@ -164,3 +164,4 @@ Configs: {
 		InvalidProgressionValue: "無効な進行値が 0 にリセットされました。"
 	}
 }
+

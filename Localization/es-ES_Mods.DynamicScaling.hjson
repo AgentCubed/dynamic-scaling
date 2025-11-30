@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] Rango"
+			Tooltip: El rango en bloques usado para la detección de proximidad del jefe.
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Adaptación de armas"
 			BossDynamicDamageScaling: "[i:184] Escalado dinámico de daño (jefe)"
 			PlayerHighHealthDamageScaling: "[i:184] Escalado daño por alta vida (jugador)"
-			All Settings: All Settings
+			AllSettings: "[i:43] Todas las configuraciones"
 		}
 
 		HighHealthThreshold: {

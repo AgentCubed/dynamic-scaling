@@ -193,7 +193,7 @@ namespace DynamicScaling
         [TooltipKey("$Mods.DynamicScaling.Configs.ServerConfig.WeaponAdaptationAdaptToSoloPlayers.Tooltip")]
         public bool WeaponAdaptationAdaptToSoloPlayers { get; set; } = false;
 
-        [Header("All Settings")]
+        [Header("AllSettings")]
         [DefaultValue(false)]
         public bool DebugMode { get; set; } = false;
 

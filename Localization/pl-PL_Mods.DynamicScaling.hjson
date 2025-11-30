@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] Zasięg"
+			Tooltip: Zasięg w blokach używany do wykrywania bliskości bossa.
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Adaptacja broni"
 			BossDynamicDamageScaling: "[i:184] Dynamiczne skalowanie obrażeń (boss)"
 			PlayerHighHealthDamageScaling: "[i:184] Skalowanie dodatkowego obrażenia przy wysokim zdrowiu (gracz)"
-			All Settings: Ustawienia administratora
+			AllSettings: "[i:43] Wszystkie ustawienia"
 		}
 
 		HighHealthThreshold: {
@@ -159,8 +159,8 @@ Configs: {
 	}
 
 	Messages: {
-		BossBeginningAdaptation: "{0}이(가) {1}의 {2}에 적응을 시작합니다..."
-		BossAdapted: "{0}이(가) {1}의 {2}에 적응했습니다."
+		BossBeginningAdaptation: "{0} zaczyna się dostosowywać do {2} gracza {1}..."
+		BossAdapted: "{0} dostosował się do {2} gracza {1}."
 		InvalidProgressionValue: Nieprawidłowe wartości postępu zostały zresetowane do 0.
 	}
 }

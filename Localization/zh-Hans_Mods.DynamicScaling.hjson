@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] 范围"
+			Tooltip: 用于首领接近检测的范围（方块数）。
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 武器适应"
 			BossDynamicDamageScaling: "[i:184] Boss 动态伤害缩放"
 			PlayerHighHealthDamageScaling: "[i:184] 玩家高生命额外伤害缩放"
-			All Settings: 管理员设置
+			AllSettings: "[i:43] 所有设置"
 		}
 
 		HighHealthThreshold: {

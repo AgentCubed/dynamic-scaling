@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] Дальность"
+			Tooltip: Дальность в блоках, используемая для обнаружения близости босса.
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] Адаптация оружия"
 			BossDynamicDamageScaling: "[i:184] Динамическое масштабирование урона (босс)"
 			PlayerHighHealthDamageScaling: "[i:184] Масштабирование урона при высоком здоровье (игрок)"
-			All Settings: Настройки администратора
+			AllSettings: "[i:43] Все настройки"
 		}
 
 		HighHealthThreshold: {

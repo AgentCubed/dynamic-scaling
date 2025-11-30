@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] 範圍"
+			Tooltip: 用於首領接近檢測的範圍（方塊數）。
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 武器自適應"
 			BossDynamicDamageScaling: "[i:184] 首領動態傷害縮放"
 			PlayerHighHealthDamageScaling: "[i:184] 玩家高生命額外傷害縮放"
-			All Settings: 管理者設定
+			AllSettings: "[i:43] 所有設定"
 		}
 
 		HighHealthThreshold: {
@@ -164,3 +164,4 @@ Configs: {
 		InvalidProgressionValue: "無效的進度值已被重設為 0。"
 	}
 }
+

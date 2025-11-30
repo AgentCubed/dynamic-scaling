@@ -48,8 +48,8 @@ Configs: {
 		}
 
 		Range: {
-			Label: "[i:43] Range"
-			Tooltip: The range in pixels used for boss proximity detection.
+			Label: "[i:43] 범위"
+			Tooltip: "보스 근처 감지에 사용되는 범위(블록 단위)."
 		}
 
 		StopTargetingIfLowest: {
@@ -115,7 +115,7 @@ Configs: {
 			WeaponAdaptation: "[i:3507] 무기 적응"
 			BossDynamicDamageScaling: "[i:184] 보스 동적 데미지 스케일링"
 			PlayerHighHealthDamageScaling: "[i:184] 플레이어 높은 체력 피해 스케일링"
-			All Settings: 관리자 설정
+			AllSettings: "[i:43] 모든 설정"
 		}
 
 		HighHealthThreshold: {
@@ -164,3 +164,4 @@ Configs: {
 		InvalidProgressionValue: "잘못된 진행값이 0으로 재설정되었습니다."
 	}
 }
+

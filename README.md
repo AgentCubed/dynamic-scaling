@@ -19,9 +19,9 @@ $$
 
 Where:
 
-* $C_{deal}$: Global `DealDamage` configuration value.
-* $N_{deaths}^{(p)}$: Number of deaths for player $p$ during the current boss fight.
-* $\delta_{deal}^{(p)}$: Player-specific `DealDamageModifierDifference` from `PlayerOverrides`.
+-   $C_{deal}$: Global `DealDamage` configuration value.
+-   $N_{deaths}^{(p)}$: Number of deaths for player $p$ during the current boss fight.
+-   $\delta_{deal}^{(p)}$: Player-specific `DealDamageModifierDifference` from `PlayerOverrides`.
 
 ### 1.2 Damage Intake Scaling ($D_{in}$)
 
@@ -36,8 +36,8 @@ $$
 
 Where:
 
-* $C_{take}$: Global `TakeDamage` configuration value.
-* $\delta_{take}^{(p)}$: Player-specific `TakeDamageModifierDifference`.
+-   $C_{take}$: Global `TakeDamage` configuration value.
+-   $\delta_{take}^{(p)}$: Player-specific `TakeDamageModifierDifference`.
 
 ### 1.3 Expected Players Scaling ($S_{exp}$)
 
@@ -55,9 +55,9 @@ $$
 
 Where:
 
-* $N_{nearby}$: Count of active players within 500 tiles of the boss.
-* $N_{expected}$: `ExpectedPlayers` config value.
-* $K_{scale}$: `ScalingMultiplier` config value.
+-   $N_{nearby}$: Count of active players within 500 tiles of the boss.
+-   $N_{expected}$: `ExpectedPlayers` config value.
+-   $K_{scale}$: `ScalingMultiplier` config value.
 
 ### 1.4 Equalize Deaths Mode ($M_{eq}$)
 
@@ -108,10 +108,10 @@ $$
 
 Where:
 
-* $T_{above}$: Time in seconds the player has been above the health threshold.
-* $T_{delay}$: `HighHealthDelaySeconds` (default: 10s).
-* $C_{rate}$: `HighHealthDamageIncreasePerSecond` (default: 1).
-* $C_{max}$: `HighHealthDamageMaximum` (default: 100).
+-   $T_{above}$: Time in seconds the player has been above the health threshold.
+-   $T_{delay}$: `HighHealthDelaySeconds` (default: 10s).
+-   $C_{rate}$: `HighHealthDamageIncreasePerSecond` (default: 1).
+-   $C_{max}$: `HighHealthDamageMaximum` (default: 100).
 
 ---
 
@@ -141,20 +141,20 @@ $$
 
 **Application:**
 
-* **Too Slow ($\Delta T > 0$):** Boss offense increases.
-  $$
-  {boss\_in} \leftarrow D_{boss\_in} \times M_{pace}
-  $$
-* **Too Fast ($\Delta T < 0$):** Boss defense increases.
-  $$
-  {boss\_in} \leftarrow D_{boss\_in} / M_{pace}
-  $$
+-   **Too Slow ($\Delta T > 0$):** Boss offense increases.
+    $$
+    {boss\_in} \leftarrow D_{boss\_in} \times M_{pace}
+    $$
+-   **Too Fast ($\Delta T < 0$):** Boss defense increases.
+    $$
+    {boss\_in} \leftarrow D_{boss\_in} / M_{pace}
+    $$
 
 Where:
 
-* $T_{total}$: `ExpectedTotalMinutes` (converted to ticks).
-* $H_{pct}$: Current health percentage ($0.0 - 1.0$).
-* $T_{deadzone}$: `ExpectedTotalMinutes / 5`.
+-   $T_{total}$: `ExpectedTotalMinutes` (converted to ticks).
+-   $H_{pct}$: Current health percentage ($0.0 - 1.0$).
+-   $T_{deadzone}$: `ExpectedTotalMinutes / 5`.
 
 ### 2.2 Weapon Adaptation ($W_{adapt}$)
 
@@ -162,9 +162,9 @@ The boss adapts to a specific Player/Weapon combination (a "Combo") if that comb
 
 **Implementation Details:**
 
-* **Combo Key:** Defined by $(\text{playerId}, \text{weaponKey})$.
-* **Phase Damage ($D_{phase}^{(i,w)}$):** Damage recorded for combo $(i,w)$ during the current 10% HP phase.
-* **Running Average ($\bar{D}_{run}^{(i,w)}$):** Maintained using EMA with a smoothing factor $\alpha$ (`PhaseAvgAlpha` = 0.4).
+-   **Combo Key:** Defined by $(\text{playerId}, \text{weaponKey})$.
+-   **Phase Damage ($D_{phase}^{(i,w)}$):** Damage recorded for combo $(i,w)$ during the current 10% HP phase.
+-   **Running Average ($\bar{D}_{run}^{(i,w)}$):** Maintained using EMA with a smoothing factor $\alpha$ (`PhaseAvgAlpha` = 0.4).
 
 **EMA Update (on phase boundary):**
 
@@ -193,5 +193,5 @@ When a hit from a combo with $\lambda < 1$ occurs, hit damage is multiplied by $
 
 **Weapon Key Encoding:**
 
-* **Items:** `weaponKey = item.type + 1` (positive keys).
-* **Projectiles:** If the owner's held item is valid, the held item key is used; otherwise projectiles use `-(projectile.type + 1)` (unique negative keys).
+-   **Items:** `weaponKey = item.type + 1` (positive keys).
+-   **Projectiles:** If the owner's held item is valid, the held item key is used; otherwise projectiles use `-(projectile.type + 1)` (unique negative keys).
